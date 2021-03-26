@@ -1,0 +1,124 @@
+/*body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}*/
+@font-face {
+  font-family: 'UT Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./Fonturi-UT/UTSans-Regular.otf') format('truetype');
+
+}
+
+body {
+  font-family: "UT Sans", sans-serif;
+}
+
+h1 {
+  font-family: "UT Sans", sans-serif !important;
+  color: #666666 !important;
+}
+
+h2 {
+  font-family: "UT Sans", sans-serif;
+}
+
+h3 {
+  font-family: "UT Sans", sans-serif;
+}
+
+h4 {
+  font-family: "UT Sans", sans-serif;
+}
+
+h5 {
+  font-family: "UT Sans", sans-serif;
+}
+
+h6 {
+  font-family: "UT Sans", sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+  monospace;
+}
+
+input {
+  font-family: "UT Sans", sans-serif;
+}
+
+span {
+  font-family: "UT Sans", sans-serif;
+}
+
+textarea{
+  font-family: "UT Sans", sans-serif;
+}
+
+.underline {
+  display: inline-block;
+  text-decoration: none;
+  border-bottom: 1px solid slategrey;
+  margin-bottom: -1px;
+}
+
+p.bigText {
+  font-size: large;
+  font-weight: bold;
+  color: #666666;
+}
+
+a:link {
+  color: #00B4AD;
+}
+
+a:visited {
+  color: #00B4AD;
+}
+
+input[type="number"]:disabled {
+  background: #F7F7F7;
+  border: 1px solid #A7A7A7;
+}
+
+input[type="number"] {
+  padding-left: 9px;
+}
+
+
+/*override la css-uri din DNN*/
+.row {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+.grid {
+  border: 0 !important;
+}
+
+
+#MainWrapper {
+  max-width: 1720px !important;
+}
+
+.spd-row {
+  max-width: 1720px !important;
+}
+
+.modal{
+  top: unset!important;
+  right: unset!important;
+  bottom: unset!important;
+  left: unset!important;
+}
+

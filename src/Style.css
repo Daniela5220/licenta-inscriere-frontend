@@ -1,0 +1,31 @@
+.tb-teme-student{
+    width:90%!important;
+    margin-left: 4%!important;
+    margin-bottom: 3%!important;
+    border-color:dodgerblue!important;
+
+}
+.titlu{
+    margin-left: 30%!important;
+    font-size: 150%!important;
+    padding-bottom: 3%!important;
+}
+.spatiu{
+    margin-right:5%!important; ;
+}
+
+.body{
+    font-family: "UT Sans", sans-serif;
+    margin-left: 10%!important;
+    margin-right: 10%!important;
+}
+.cr-text{
+margin-top: 5%!important;
+
+}
+.teme-textArea{
+    width: 100%!important;
+}
+.savebutton{
+    margin-top: 2%!important;
+}
