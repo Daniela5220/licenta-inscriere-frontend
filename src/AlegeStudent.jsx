@@ -24,11 +24,13 @@ class AlegeStudent extends Component {
 
     state = {
         username: "maican@unitbv.ro",
-        id_An: 39,
+        ID_AnUniv: 39,
         listaCereri: [],
         idStatusNou:null,
         listaStatus: [],
         selectedOption: null,
+        ID_SefDep:null
+
     }
 
 
@@ -38,7 +40,7 @@ class AlegeStudent extends Component {
 
             axios
 
-                .get('Optiune/Get?ProfesorUsername=' + this.state.username + '&ID_An=' + this.state.id_An +'&Nr_optiune='+Nr_Optiune)
+                .get('Optiune/Get?ProfesorUsername=' + this.state.username + '&ID_An=' + this.state.ID_AnUniv +'&Nr_optiune='+Nr_Optiune)
                 .then(re => {
                     this.setState({listaCereri: re.data})
                     console.log(re.data);
@@ -92,20 +94,56 @@ class AlegeStudent extends Component {
     }
 
 
-    savefunction = (varop,ID_student) => {
+    savefunction = (varop,ID_student,tema,profesor) => {
 
 
+        console.log(ID_student)
         console.log(varop)
+        console.log(tema)
+        console.log(profesor)
+        axios
+            .get('Optiune/GetIDProfesorSefCatedraByIDStudent?ID_student='+ID_student+'&ID_AnUniv=' + this.state.ID_AnUniv)
+            .then(re => {
+
+                this.setState({
+                    ID_SefDep:re.data[0].ID_ProfesorSefCatedra
+                })
+            })
+
+            console.log(this.state.ID_SefDep)
+
         axios
             .put('Optiune/Put?id_optiune=' + varop + '&id_status_optiune=' + this.state.idStatusNou+ '&ID_student='+ID_student)
             .then(re => {
 
                 console.log('Modificarile au fost salvate');
+                if(this.state.idStatusNou==1){
+                    const request={
+                        ID_student:ID_student,
+                        ID_optiune:varop,
+                        Tema_lucrare:tema,
+                        ID_director_departament:this.state.ID_SefDep,
+                        ID_AnUnivFisa:this.state.ID_AnUniv,
+                        ID_profesor_coordonator:profesor
+                    };
+                    const post=JSON.stringify(request);
+                    axios
+                        .post('Optiune/PostFisaPreliminara',post)
+                        .then(re=>
+                            console.log("Fisa Preliminara a fost facuta")
+
+                        )
+                    // axios
+                    //     .post('Optiune/PostFisa?ID_student='+ID_student+'&ID_optiune='+varop+'&Tema_lucrare='+tema+'&ID_director_departament='+this.state.ID_SefDep+'&ID_AnUnivFisa='+this.state.ID_AnUniv+'&ID_profesor_coordonator='+profesor)
+                    //     .then(response => {
+                    //         console.log("Fisa a fost adaugata")
+                    //     })
+                }
 
                 const Nr_Optiune= this.seteazanroptiune(d,d1,d2,d3,d4);
                 axios
 
-                    .get('Optiune/Get?ProfesorUsername=' + this.state.username + '&ID_An=' + this.state.id_An +'&Nr_optiune='+Nr_Optiune)
+                    .get('Optiune/Get?ProfesorUsername=' + this.state.username + '&ID_An=' + this.state.ID_AnUniv +'&Nr_optiune='+Nr_Optiune)
                     .then(re => {
                         this.setState({listaCereri: re.data})
                         console.log(re.data);
@@ -122,7 +160,7 @@ class AlegeStudent extends Component {
     render() {
 
         return (
-            <div>
+            <div className={"body"}>
                 <div className={"titlu"}>Lista studentilor si temelor pentru un anumit profesor  </div>
 
                 <div>
@@ -166,7 +204,7 @@ class AlegeStudent extends Component {
                                         </Table.Cell>
                                         <Table.Cell>
                                             <Button color='green' onClick={() => {
-                                            this.savefunction(e.ID_optiune,e.ID_student)
+                                            this.savefunction(e.ID_optiune,e.ID_student,e.Tema_lucrare,e.ID_profesor)
                                                 console.log(e.ID_student)
                                             }} >Salveaza</Button>
                                         </Table.Cell>

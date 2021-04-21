@@ -24,12 +24,40 @@ function App() {
 import AlegeStudent from "./AlegeStudent";
 import {Component} from "react";
 import DepuneCerere from "./DepuneCerere";
+import Optiune from "./Optiune";
+import RepartizareStudenti from "./RepartizareStudenti";
+import {Dimmer} from "semantic-ui-react";
+import FisaPreliminara from "./FisaPreliminara";
+import FisaPreliminariiIndrumatori from "./FisaPreliminariiIndrumatori";
+
 class App extends Component {
+    state={
+        username:'maican@unitbv.ro',
+        ID_AnUniv:39
+    }
+    fisapreliminaraacces=()=>{
+
+        if(this.state.username==='maican@unitbv.ro'){
+            return(
+                <FisaPreliminariiIndrumatori/>
+                )
+
+
+        }else{
+            return(
+                <FisaPreliminara
+                    username={this.state.username}
+                    ID_AnUniv={this.state.ID_AnUniv}
+                />
+            )
+        }
+    }
 
   render() {
     return (
         <div>
-          <DepuneCerere/>
+
+            {this.fisapreliminaraacces()}
 
         </div>
     )

@@ -7,8 +7,8 @@
 }
 .titlu{
     margin-left: 30%!important;
-    font-size: 150%!important;
-    padding-bottom: 3%!important;
+    font-size: 200%!important;
+    padding-bottom: 4%!important;
 }
 .spatiu{
     margin-right:5%!important; ;
@@ -28,4 +28,15 @@ margin-top: 5%!important;
 }
 .savebutton{
     margin-top: 2%!important;
+}
+
+.dropdownr{
+    margin-right: 5%!important;
+    width: 35vmax!important;
+}
+.fptrow{
+    width:30%!important;
+}
+.TextArea{
+    width:100%!important;
 }
