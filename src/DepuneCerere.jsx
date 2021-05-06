@@ -132,6 +132,7 @@ class DepuneCerere extends Component {
                             <div>FACULTATEA {e.DenumireFacultate} </div>
 
                             <div>ABSOLVIRE/LICENTA, anul</div>
+                            <div>SESIUNEA:</div>
                             <h1>CERERE DE ALEGERE A TEMEI DE LICENTA SI A CADRULUI DIDACTIC INDRUMATOR</h1>
 
                             <div className={"cr-text"}>Subsemnatul(a) {e.Nume} {e.Prenume} student(a)/absolvent(a) al(a)

@@ -16,8 +16,8 @@
 
 .body{
     font-family: "UT Sans", sans-serif;
-    margin-left: 10%!important;
-    margin-right: 10%!important;
+    margin-left: 8%!important;
+    margin-right: 8%!important;
 }
 .cr-text{
 margin-top: 5%!important;
@@ -37,6 +37,9 @@ margin-top: 5%!important;
 .fptrow{
     width:30%!important;
 }
-.TextArea{
+TextArea{
     width:100%!important;
+}
+.sizetablecell{
+    width:50%!important;
 }

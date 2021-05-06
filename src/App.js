@@ -29,6 +29,8 @@ import RepartizareStudenti from "./RepartizareStudenti";
 import {Dimmer} from "semantic-ui-react";
 import FisaPreliminara from "./FisaPreliminara";
 import FisaPreliminariiIndrumatori from "./FisaPreliminariiIndrumatori";
+import Vize from "./Vize";
+import FisaLucrarii from "./FisaLucrarii";
 
 class App extends Component {
     state={
@@ -58,6 +60,7 @@ class App extends Component {
         <div>
 
             {this.fisapreliminaraacces()}
+            {/*<FisaLucrarii/>*/}
 
         </div>
     )

@@ -1,4 +1,5 @@
-import React, {Component} from 'react'
+import React, {Component} from 'react';
+import  { useState } from 'react';
 import {
     Button,
     Dropdown,
@@ -9,22 +10,35 @@ import {
     Table,
     TableHeader,
     TableRow,
-    TableCell, TableBody
+    TableCell,
+    TableBody, GridRow, GridColumn, TableHeaderCell
+
 } from "semantic-ui-react";
 import Style from'./Style.css';
-import axios from "./axios-API"
+import axios from "./axios-API";
 import App from "./App";
+import DataPicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import moment from "moment";
+import { SingleDatePicker } from "react-dates";
+import "react-dates/initialize";
+import "react-dates/lib/css/_datepicker.css";
+import "moment/locale/ro";
+import DateTimePicker from 'react-datetime-picker';
 
-var today = new Date(),
-    date =today.getDate()+ '-' + (today.getMonth() + 1)+ '-' + today.getFullYear();
+
+// var today = new Date(),
+//     date =today.getDate()+ '-' + (today.getMonth() + 1)+ '-' + today.getFullYear();
+
+
+
 class FisaPreliminara extends Component {
     constructor(props) {
-        super(props)
+        super(props);
 
     }
-
     state ={
-        date: date,
+        // date: date,
         username:'octavian.dorvos@student.unitbv.ro',
        ID_facultate:null,
         ID_AnUniv:39,
@@ -32,8 +46,16 @@ class FisaPreliminara extends Component {
         problemePrincipale:null,
         locdurata:null,
         bibliografie:null,
-        aspecteparticulare:null
+        aspecteparticulare:null,
+        startDate:new Date(),
+        focused:false,
+        focused2:false,
+        focused3:false,
+        focused4:false,
+
     }
+
+
     componentDidMount() {
 
         axios
@@ -51,11 +73,33 @@ class FisaPreliminara extends Component {
                     Fisa: rez.data
 
                 })
+                if(rez.data[0].Termen1==null){
+                    this.setState({t1:moment()})
+                }else{
+                    this.setState({t1:rez.data[0].Termen1})
+                }
+                if(rez.data[0].Termen2==null){
+                    this.setState({t2:moment()})
+                }else{
+                    this.setState({t2:rez.data[0].Termen2})
+                }
+                if(rez.data[0].Termen3==null){
+                    this.setState({t3:moment()})
+                }else{
+                    this.setState({t3:rez.data[0].Termen3})
+                }
+                if(rez.data[0].Termen4==null){
+                    this.setState({t4:moment()})
+                }else{
+                    this.setState({t4:rez.data[0].Termen4})
+                }
+
 
             });
 
     })
 }
+
 
 changeProblemePrincipale=(p)=>{
     this.setState({problemePrincipale:p})
@@ -75,22 +119,50 @@ changeProblemePrincipale=(p)=>{
 
     }
 
-    update=(fisa)=>{
-        console.log("Crapa?")
+    updatebystudent=(fisa)=> {
+
+        if(this.state.aspecteparticulare!=null) {
+            axios
+                .put('Optiune/PutFisaPreliminaraStudent?ID_fisa_preliminara=' + fisa + '&Aspecte_particulare=' + this.state.aspecteparticulare)
+                .then(re => {
+                console.log("Updatarile au fost efectuate")
+            })
+
+        }
+    }
+
+
+
+
+
+
+    update=(fisa, Probleme_principale)=>{
+
+
         if(this.state.problemePrincipale==null||this.state.locdurata==null||this.state.bibliografie==null){
 
             console.log("Nu ai comletat toate campurile")
 
         }else{
+            console.log(this.state.t1.format('DD/MM/yyyy'));
+
             axios
-                .put('Optiune/PutFisaPreliminara?ID_fisa_preliminara='+fisa+'&probleme_principale='+this.state.problemePrincipale+'&loc_durata='+this.state.locdurata+'&bibliografie='+this.state.bibliografie)
+                .put('Optiune/PutFisaPreliminara?ID_fisa_preliminara='+fisa+'&probleme_principale='+this.state.problemePrincipale+'&loc_durata='+this.state.locdurata+'&bibliografie='+this.state.bibliografie+'&Termen1='+this.state.t1.format('DD/MM/yyyy')+'&Termen2='+this.state.t2.format('DD/MM/yyyy')+'&Termen3='+this.state.t3.format('DD/MM/yyyy')+'&Termen4='+this.state.t4.format('DD/MM/yyyy'))
                 .then(re=> {
                     console.log("Updatarile au fost efectuate")
 
 
 
                 })
-        }}
+        }
+        if(this.state.problemePrincipale==null){
+            console.log(Probleme_principale)
+            this.setState({problemePrincipale:Probleme_principale})
+        }
+
+    }
+
+
 
 
     componentDidUpdate(prevProps, prevState) {
@@ -103,14 +175,6 @@ changeProblemePrincipale=(p)=>{
         }
 
     }
-
-
-
-
-
-
-
-
     render(){
         return(
             <div className={'body'}>
@@ -119,7 +183,8 @@ changeProblemePrincipale=(p)=>{
                     {this.state.Fisa.map((e, index) => {
                         return (
                             <div key={e.ID_fisa_preliminara}>
-                            <Table >
+
+                                <Table >
                                 <TableHeader>UNIVERSITATEA TRANSILVANIA DIN BRASOV</TableHeader>
                                 <tbody>
 
@@ -144,7 +209,7 @@ changeProblemePrincipale=(p)=>{
 
                 </Table>
                 <h1>FIŞA PRELIMINARĂ A LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENŢĂ/
-                            PROIECTULUI DE DIPLOMĂ/ DISERTAŢIEI
+                            PROIECTULUI DE DIPLOMĂ/ DISERTAŢTIE
                         </h1>
                 <Table >
                     <tbody>
@@ -196,18 +261,89 @@ changeProblemePrincipale=(p)=>{
                     <TableCell>Termen 4</TableCell>
                 </TableRow>
                     <TableRow>
-                        <TableCell><Input defaultValue={e.Termen1}/></TableCell>
-                        <TableCell><Input defaultValue={e.Termen2}/></TableCell>
-                        <TableCell><Input defaultValue={e.Termen3}/></TableCell>
-                        <TableCell><Input defaultValue={e.Termen4}/></TableCell>
+                        <TableCell>
+
+
+                            <SingleDatePicker
+
+                               date={moment(this.state.t1)}
+                                onDateChange={t1=>this.setState({t1})}
+                                displayFormat="DD/MM/YYYY"
+                                placeholder="Data"
+                                focused={this.state.focused}
+                                onFocusChange={({focused })=>this.setState({focused})}
+                                numberOfMonths={1}
+                                isOutsideRange={() => false}
+
+
+                            />
+                        </TableCell>
+
+                        <TableCell>
+                            <SingleDatePicker
+
+                                date={moment(this.state.t2)}
+                                onDateChange={t2=>this.setState({t2})}
+                                displayFormat="DD/MM/YYYY"
+                                placeholder="Data"
+                                focused={this.state.focused2}
+                                onFocusChange={({focused:focused2})=>this.setState({focused2})}
+                                numberOfMonths={1}
+                                isOutsideRange={() => false}
+                            />
+
+                        </TableCell>
+                        <TableCell>
+                            <SingleDatePicker
+
+                                date={moment(this.state.t3)}
+                                onDateChange={t3=>this.setState({t3})}
+                                displayFormat="DD/MM/YYYY"
+                                placeholder="Data"
+                                focused={this.state.focused3}
+                                onFocusChange={({focused:focused3})=>this.setState({focused3})}
+                                numberOfMonths={1}
+                                isOutsideRange={() => false}
+                            />
+                        </TableCell>
+                        <TableCell>
+                            <SingleDatePicker
+
+                                date={moment(this.state.t4)}
+                                onDateChange={t4=>this.setState({t4})}
+                                displayFormat="DD/MM/YYYY"
+                                placeholder="Data"
+                                focused={this.state.focused4}
+                                onFocusChange={({focused:focused4})=>this.setState({focused4})}
+                                numberOfMonths={1}
+                                isOutsideRange={() => false}
+                            />
+                        </TableCell>
                     </TableRow>
                     </tbody>
 
             </Table>
                 <div>Termenul de predare a lucrarii</div>
-                <div>Data: {this.state.date}</div>
+                                <div>Sematuri:</div>
+                    <Table>
+                        <TableHeader>
+                            <TableHeaderCell>Student</TableHeaderCell>
+                            <TableHeaderCell>Profesor coordonator</TableHeaderCell>
+                            <TableHeaderCell>Diretor departament</TableHeaderCell>
+                        </TableHeader>
+                        <tbody>
+                        <TableRow>
+                            <TableCell>{e.NumeStudent} {e.PrenumeStudent}</TableCell>
+                            <TableCell>{e.NumeCoordonator} {e.PrenumeCoordonator}</TableCell>
+                            <TableCell>{e.NumeDirecorDepartament}</TableCell>
+                        </TableRow>
+                        </tbody>
+                    </Table>
+                {/*<div>Data: {this.state.date}</div>*/}
 
-                                <Button className={"savebutton"} color='green' onClick={() => {this.update(e.ID_fisa_preliminara)}}>Update</Button>
+
+                                <Button className={"savebutton"} color='green' onClick={() => {this.update(e.ID_fisa_preliminara,e.Probleme_principale)}}>Save</Button>
+                                <Button className={"savebutton"} color='green' onClick={() => {this.updatebystudent(e.ID_fisa_preliminara)}}>SaveStud</Button>
 
                             </div>
 

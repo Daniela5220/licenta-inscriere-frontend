@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Button, Dropdown, Table, TextArea} from "semantic-ui-react";
+import {Button, Dropdown, Menu, MenuItem, Table, TextArea,Modal} from "semantic-ui-react";
 import Style from './Style.css';
 import axios from "./axios-API"
 import FisaPreliminara from "./FisaPreliminara"
@@ -73,12 +73,18 @@ class FisaPreliminariiIndrumatori extends Component {
             });
     }
      next=()=> {
-         i = i + 1
-         idstud = this.state.fisepreliminarii[i].value
 
-         {
-             this.seteazaUsername(idstud)
-         }
+        if(i+1<this.state.fisepreliminarii.length) {
+            i = i + 1
+            idstud = this.state.fisepreliminarii[i].value
+
+            {
+                this.seteazaUsername(idstud)
+            }
+        }else{
+            console.log("STOP")
+
+        }
 
      }
     componentDidUpdate(prevProps, prevState) {
@@ -95,9 +101,15 @@ class FisaPreliminariiIndrumatori extends Component {
 
 
     back=()=>{
-        i=i-1
-        idstud=this.state.fisepreliminarii[i].value
-        {this.seteazaUsername(idstud)}
+        if(i>=1) {
+            i=i-1
+            idstud=this.state.fisepreliminarii[i].value
+            {this.seteazaUsername(idstud)}
+
+        }else{
+            console.log("STOP")
+        }
+
 
     }
     seteazaUsername = (IDStudent) => {
@@ -123,14 +135,29 @@ class FisaPreliminariiIndrumatori extends Component {
 
             <div className={"body"}>
                 <h1>Fise preliminarii</h1>
-                <Dropdown
+                <Menu borderless inverted color={'grey'}>
 
-                    searchInput={{ type: 'string' }}
-                    placeholder='Alege fisa preliminara'
-                    search selection   options={this.state.fisepreliminarii}
-                     onChange={((e, data) => this.seteazaUsername(data.value))}
+                    <MenuItem>
+                        <Dropdown
 
-                />
+                            searchInput={{ type: 'string' }}
+                            placeholder='Alege fisa preliminara'
+                            search selection   options={this.state.fisepreliminarii}
+                            onChange={((e, data) => this.seteazaUsername(data.value))}
+
+                        />
+
+
+                    </MenuItem>
+
+                    <MenuItem>
+
+                        <Button className={"savebutton"} color='green' onClick={() => {this.back()}}>Inapoi</Button>
+                    </MenuItem>
+                    <MenuItem>
+                        <Button className={"savebutton"} color='green' onClick={() => {this.next()}}>Urmatorul</Button>
+                    </MenuItem>
+                </Menu>
 
                 {this.afisare()}
 

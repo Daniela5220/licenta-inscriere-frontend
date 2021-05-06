@@ -117,29 +117,28 @@ class AlegeStudent extends Component {
             .then(re => {
 
                 console.log('Modificarile au fost salvate');
-                if(this.state.idStatusNou==1){
-                    const request={
-                        ID_student:ID_student,
-                        ID_optiune:varop,
-                        Tema_lucrare:tema,
-                        ID_director_departament:this.state.ID_SefDep,
-                        ID_AnUnivFisa:this.state.ID_AnUniv,
-                        ID_profesor_coordonator:profesor
+                if(this.state.idStatusNou==1) {
+                    const request = {
+                        ID_student: ID_student,
+                        ID_optiune: varop,
+                        Tema_lucrare: tema,
+                        ID_director_departament: this.state.ID_SefDep,
+                        ID_AnUnivFisa: this.state.ID_AnUniv,
+                        ID_profesor_coordonator: profesor
                     };
-                    const post=JSON.stringify(request);
+                    const post = JSON.stringify(request);
                     axios
-                        .post('Optiune/PostFisaPreliminara',post)
-                        .then(re=>
+                        .post('Optiune/PostFisaPreliminara', post)
+                        .then(re =>
                             console.log("Fisa Preliminara a fost facuta")
+                        );
+                    axios
+                        .post('Optiune/PostFisaLucrare?ID_student=' + ID_student)
+                        .then(rezultat =>{
+                                console.log("Fisa lucrarii a fost creata")
+                        }
 
-                        )
-                    // axios
-                    //     .post('Optiune/PostFisa?ID_student='+ID_student+'&ID_optiune='+varop+'&Tema_lucrare='+tema+'&ID_director_departament='+this.state.ID_SefDep+'&ID_AnUnivFisa='+this.state.ID_AnUniv+'&ID_profesor_coordonator='+profesor)
-                    //     .then(response => {
-                    //         console.log("Fisa a fost adaugata")
-                    //     })
-                }
-
+                        )}
                 const Nr_Optiune= this.seteazanroptiune(d,d1,d2,d3,d4);
                 axios
 
