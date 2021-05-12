@@ -11,16 +11,12 @@ class DepuneCerere extends Component {
 
     state = {
         Student: [],
+        Sesiune:[],
+        sesiuneAleasa:null,
         listaProfesori: [],
         selectedOption: null,
-        // titlulucrare1: null,
-        // titlulucrare2: null,
-        // titlulucrare3: null,
-        // ID_profesor_ales1: null,
-        // ID_profesor_ales2: null,
-        // ID_profesor_ales3: null,
+       semnaturaStudentFile:null,
         ID_student: null,
-        studusername: 'elena.dumitrascu@student.unitbv.ro',
         ID_AnUniv: 39,
         ID_facultate: null,
         listat: [],
@@ -31,7 +27,8 @@ class DepuneCerere extends Component {
                 ID_profesor: null,
                 ID_status_optiune: null,
                 ID_student: null,
-                ID_AnUnivInscriere: null
+                ID_AnUnivInscriere: null,
+                ID_CerereInscriere:null
             },
             {
                 Tema_lucrare: null,
@@ -39,7 +36,8 @@ class DepuneCerere extends Component {
                 ID_profesor: null,
                 ID_status_optiune: null,
                 ID_student: null,
-                ID_AnUnivInscriere: null
+                ID_AnUnivInscriere: null,
+                ID_CerereInscriere:null
             },
             {
                 Tema_lucrare: null,
@@ -47,15 +45,60 @@ class DepuneCerere extends Component {
                 ID_profesor: null,
                 ID_status_optiune: null,
                 ID_student: null,
-                ID_AnUnivInscriere: null
+                ID_AnUnivInscriere: null,
+                ID_CerereInscriere:null
             }
         ],
 
 
     }
+    onFileChange = event => {
+        // Update the state
+        this.setState({semnaturaStudentFile: event.target.files[0]});
+        console.log(event.target.files[0])
+        this.setState({
+            file: URL.createObjectURL(event.target.files[0])
+        })
 
+    };
+    fileData = () => {
+        if (this.state.semnaturaStudentFile) {
+            return (
+                <div>
+                    <p>{/*Last Modified:{" "}*/}
+                        {/*{this.state.selectedFile.lastModifiedDate.toDateString()}*/}
+                        <object data={this.state.file} type="application/pdf" width="25%" height="25%"/>
+                    </p>
+                </div>
+            );
+        }
+    };
 
     savefunction = () => {
+        // Create an object of formData
+        const formData = new FormData();
+
+        // Update the formData object
+        formData.append(
+            "myFile",
+            this.state.semnaturaStudentFile,
+            this.state.semnaturaStudentFile.name
+        );
+
+        // Details of the uploaded file
+        console.log(this.state.semnaturaStudentFile);
+
+        // Request made to the backend api
+        // Send formData object
+        console.log(formData)
+
+        //Adaugam in baza de date o cerere
+        axios
+            .post('Optiune/PostCerere?Sesiune='+this.state.sesiuneAleasa+'&ID_AnUnivCerereInscriere=39',formData)
+            .then(rez=>{
+                console.log('Cererea a fost creeata , sa vedem daca merge')
+            })
+        //Adaugam optiuni
         let optiuniCopy = [...this.state.optiuni]
 
         axios
@@ -67,10 +110,13 @@ class DepuneCerere extends Component {
 
     }
 
+   alegeSesiune=(sesiune)=>{
+        this.setState({sesiuneAleasa:sesiune})
+   }
 
     componentDidMount() {
         axios
-            .get('Optiune/GetStudentByUsernameAnUniv?StudentUsername=' + this.state.studusername + '&ID_AnUniv=' + this.state.ID_AnUniv)
+            .get('Optiune/GetStudentByUsernameAnUniv?ID_AnUniv=' + this.state.ID_AnUniv)
             .then(re => {
                 this.setState({
                     Student: re.data
@@ -105,6 +151,25 @@ class DepuneCerere extends Component {
             })
 
 
+
+        axios
+            .get('Optiune/GetSesiune')
+
+            .then(r => {
+                let Sesiune = [];
+                for (let sesiune of r.data) {
+                    Sesiune.push({
+                        key: sesiune,
+                        value: sesiune,
+                        text: sesiune
+
+
+                    })
+                }
+                this.setState({Sesiune: Sesiune})
+            });
+
+
     }
 
     /**
@@ -132,12 +197,23 @@ class DepuneCerere extends Component {
                             <div>FACULTATEA {e.DenumireFacultate} </div>
 
                             <div>ABSOLVIRE/LICENTA, anul</div>
-                            <div>SESIUNEA:</div>
-                            <h1>CERERE DE ALEGERE A TEMEI DE LICENTA SI A CADRULUI DIDACTIC INDRUMATOR</h1>
 
+
+                            <h1>CERERE DE ALEGERE A TEMEI DE LICENTA SI A CADRULUI DIDACTIC INDRUMATOR</h1>
                             <div className={"cr-text"}>Subsemnatul(a) {e.Nume} {e.Prenume} student(a)/absolvent(a) al(a)
                                 programului de studii {e.DenumireSpecializare}, grupa {e.DenumireGrupa} forma de
-                                invatamant {e.DenumireFormaInv}, doresc sa realizez LUCRAREA DE LICENTA cu
+                                invatamant {e.DenumireFormaInv}, doresc sa realizez LUCRAREA DE LICENTA in sesiunea
+                            </div>
+                            <div>
+                                <Dropdown
+
+                                    searchInput={{ type: 'string' }}
+                                    placeholder='Alege profesor coordonator'
+                                    search selection   options={this.state.Sesiune}
+
+                                     onChange={((e, data) => this.alegeSesiune(data.value))}
+                                />
+
                             </div>
 
                             {this.state.optiuni.map((item, index) => {
@@ -154,8 +230,12 @@ class DepuneCerere extends Component {
                                     />
                                 )
                             })}
-
-
+                            <div>
+                                Semnatura student
+                            </div>
+                            <div>{e.Nume} {e.Prenume}</div>
+                            <input type="file" onChange={this.onFileChange}/>
+                            {this.fileData()}
                             <div>
                                 <Button className={"savebutton"} color='green' onClick={() => {
 

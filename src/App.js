@@ -31,6 +31,7 @@ import FisaPreliminara from "./FisaPreliminara";
 import FisaPreliminariiIndrumatori from "./FisaPreliminariiIndrumatori";
 import Vize from "./Vize";
 import FisaLucrarii from "./FisaLucrarii";
+import Semnatura from "./Semnatura";
 
 class App extends Component {
     state={
@@ -61,6 +62,10 @@ class App extends Component {
 
             {this.fisapreliminaraacces()}
             {/*<FisaLucrarii/>*/}
+          {/*<Semnatura/>*/}
+          {/*<RepartizareStudenti/>*/}
+          {/*<DepuneCerere/>*/}
+          {/*<AlegeStudent/>*/}
 
         </div>
     )

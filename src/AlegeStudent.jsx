@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 
 import Style from './Style.css';
-import {Dropdown, TableBody} from "semantic-ui-react";
+import {Dropdown, Input, TableBody} from "semantic-ui-react";
 import {Table, Select, Button} from "semantic-ui-react";
 import axios from "./axios-API"
 
@@ -29,18 +29,19 @@ class AlegeStudent extends Component {
         idStatusNou:null,
         listaStatus: [],
         selectedOption: null,
-        ID_SefDep:null
+        ID_SefDep:null,
+        Nr_op:null
 
     }
 
 
     componentDidMount() {
 
-                const Nr_Optiune= this.seteazanroptiune(d,d1,d2,d3,d4);
+                const Nr_Optiune= this.seteazanroptiune(this.state.Nr_op);
 
             axios
 
-                .get('Optiune/Get?ProfesorUsername=' + this.state.username + '&ID_An=' + this.state.ID_AnUniv +'&Nr_optiune='+Nr_Optiune)
+                .get('Optiune/GetOptiuniListByProfesorUsername?ID_An=' + this.state.ID_AnUniv +'&Nr_optiune='+Nr_Optiune)
                 .then(re => {
                     this.setState({listaCereri: re.data})
                     console.log(re.data);
@@ -64,23 +65,39 @@ class AlegeStudent extends Component {
 
             });
     }
+    componentDidUpdate(prevProps, prevState) {
+        if (
+            prevState.Nr_op !== this.state.Nr_op
 
-    seteazanroptiune = (d,d1,d2,d3,d4) => {
-        if(d1<=d &&d<d2){
-            return 1
-        }else
-        if(d2<=d &&d<d3){
-            return 2
-        }else
-        if(d3<=d &&d<=d4) {
-            return 3
-        }else{
-            console.log("In acesta perioada nu se pot actualiza statusurile optiunilor")
-            return 0
+        ) {
+
+            this.componentDidMount()
         }
 
-
     }
+    seteazanroptiune = (op) => {
+        console.log(op)
+        if (op != null) {
+            this.setState({Nr_op: op})
+            return op
+        } else {
+
+
+            if (d1 <= d && d < d2) {
+                return 1
+            } else if (d2 <= d && d < d3) {
+                return 2
+            } else if (d3 <= d && d <= d4) {
+                return 3
+            } else {
+                console.log("In acesta perioada nu se pot actualiza statusurile optiunilor")
+                return 0
+            }
+        }
+    }
+
+
+
 
 
 
@@ -139,10 +156,10 @@ class AlegeStudent extends Component {
                         }
 
                         )}
-                const Nr_Optiune= this.seteazanroptiune(d,d1,d2,d3,d4);
+                const Nr_Optiune= this.seteazanroptiune(this.state.Nr_op);
                 axios
 
-                    .get('Optiune/Get?ProfesorUsername=' + this.state.username + '&ID_An=' + this.state.ID_AnUniv +'&Nr_optiune='+Nr_Optiune)
+                    .get('Optiune/GetOptiuniListByProfesorUsername?ID_An=' + this.state.ID_AnUniv +'&Nr_optiune='+Nr_Optiune)
                     .then(re => {
                         this.setState({listaCereri: re.data})
                         console.log(re.data);
@@ -161,6 +178,12 @@ class AlegeStudent extends Component {
         return (
             <div className={"body"}>
                 <div className={"titlu"}>Lista studentilor si temelor pentru un anumit profesor  </div>
+                <div>Lista optiunilor cu numarul</div>
+
+                <Input className={"teme-textArea"}
+                       onChange={((e, data) => this.seteazanroptiune(data.value))}
+                       placeholder={"Alege numarul optiunii"}/>
+
 
                 <div>
                     {this.state.listaCereri.map((e, index) => {

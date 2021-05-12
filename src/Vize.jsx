@@ -9,121 +9,58 @@ import "react-dates/initialize";
 import "react-dates/lib/css/_datepicker.css";
 import "moment/locale/ro";
 import DateTimePicker from 'react-datetime-picker';
-import {Table, TableCell, TableFooter, TableHeader, TableHeaderCell, TableRow, TextArea} from "semantic-ui-react";
+import {
+    Input,
+    Table,
+    TableCell,
+    TableFooter,
+    TableHeader,
+    TableHeaderCell,
+    TableRow,
+    TextArea
+} from "semantic-ui-react";
 
 class Vize extends Component {
+    constructor(props) {
+        super(props)
+
+    }
+    alegeProblema=(Problema)=>{
+        this.props.actualizareOptiuniDinState(this.props.index,"Tema_lucrare",Problema)
+
+    }
 
     render(){
         return(
             <div >
            <Table>
-               <TableHeader>
-                   <TableHeaderCell colSpan={3}>
-                   LUCRARE DE ABSOLVIRE/ LUCRARE DE LICENŢĂ/ PROIECT DE DIPLOMĂ/
-                   DISERTAŢIE – VIZE
-                   </TableHeaderCell>
-               </TableHeader>
-               <tbody>
+               {/*<TableHeader>*/}
+               {/*    <TableHeaderCell colSpan={3}>*/}
+               {/*    LUCRARE DE ABSOLVIRE/ LUCRARE DE LICENŢĂ/ PROIECT DE DIPLOMĂ/*/}
+               {/*    DISERTAŢIE – VIZE*/}
+               {/*    </TableHeaderCell>*/}
+               {/*</TableHeader>*/}
+
+               {/*<TableRow>*/}
+               {/*    <TableCell>Data vizei</TableCell>*/}
+               {/*    <TableCell className={"sizetablecell"}>Capitole/probleme analizate</TableCell>*/}
+               {/*    <TableCell>Semnatura cadrului didactic indrumator</TableCell>*/}
+               {/*</TableRow>*/}
                <TableRow>
-                   <TableCell>Data vizei</TableCell>
-                   <TableCell className={"sizetablecell"}>Capitole/probleme analizate</TableCell>
-                   <TableCell>Semnatura cadrului didactic indrumator</TableCell>
-               </TableRow>
-               <TableRow>
-                   <TableCell>
+                   <TableCell >
                    </TableCell>
                    <TableCell >
-                       <TextArea ></TextArea>
+                       <Input className={"teme-textArea"}
+                              onChange={((e, data) => this.alegeProblema(data.value))}
+                              defaultValue={this.props.vizaCopy.Problema}
+                              placeholder={"Problema propusa"}/>
                    </TableCell>
-                   <TableCell>
-                   </TableCell>
-               </TableRow>
-               <TableRow>
-                   <TableCell>
-
-                   </TableCell>
-                   <TableCell>
-                       <TextArea></TextArea>
-                   </TableCell>
-                   <TableCell>
-
+                   <TableCell >
                    </TableCell>
                </TableRow>
-               <TableRow>
-                   <TableCell>
-
-                   </TableCell>
-                   <TableCell>
-                       <TextArea></TextArea>
-                   </TableCell>
-                   <TableCell>
-
-                   </TableCell>
-               </TableRow>
-               <TableRow>
-                   <TableCell>
-
-                   </TableCell>
-                   <TableCell>
-                       <TextArea></TextArea>
-                   </TableCell>
-                   <TableCell>
-
-                   </TableCell>
-               </TableRow>
-               </tbody>
            </Table>
 
-                <Table>
-                    <TableHeader>
-                        <TableHeaderCell colSpan={3}>
-                            APRECIEREA ŞI AVIZUL CADRULUI DIDACTIC ÎNDRUMĂTOR
-                        </TableHeaderCell>
-                    </TableHeader>
-                    <tbody>
-                    <TableRow>
-                        <TableCell colSpan={3}>
-                                <TextArea></TextArea>
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>Data
 
-                        </TableCell>
-                        <TableCell>
-                                    ADMIS SAU RESPINS
-                        </TableCell>
-                        <TableCell>
-                            Profesor coordonator
-                        </TableCell>
-
-                    </TableRow>
-
-                    </tbody>
-                </Table>
-
-                <Table>
-                    <TableHeader>
-                        <TableHeaderCell colSpan={3}>
-                            AVIZUL DIRECTORULUI DE DEPARTAMENT
-                        </TableHeaderCell>
-                    </TableHeader>
-                    <tbody>
-                    <TableRow>
-                        <TableCell>Data
-
-                        </TableCell>
-                        <TableCell>
-                            ADMIS SAU RESPINS
-                        </TableCell>
-                        <TableCell>
-                            Director departament
-                        </TableCell>
-
-                    </TableRow>
-
-                    </tbody>
-                </Table>
             </div>
 
 

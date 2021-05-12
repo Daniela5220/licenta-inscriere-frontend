@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import  { useState } from 'react';
+import Semnatura from './Semnatura';
 import {
     Button,
     Dropdown,
@@ -46,12 +47,12 @@ class FisaPreliminara extends Component {
         problemePrincipale:null,
         locdurata:null,
         bibliografie:null,
-        aspecteparticulare:null,
+        aspecteParticulare:null,
         startDate:new Date(),
         focused:false,
         focused2:false,
         focused3:false,
-        focused4:false,
+        focused4:false
 
     }
 
@@ -73,6 +74,11 @@ class FisaPreliminara extends Component {
                     Fisa: rez.data
 
                 })
+                this.setState({problemePrincipale:rez.data[0].Probleme_principale})
+                this.setState({locdurata:rez.data[0].Loc_durata})
+                this.setState({bibliografie:rez.data[0].Bibliografie})
+                this.setState({aspecteParticulare:rez.data[0].Aspecte_particulare})
+
                 if(rez.data[0].Termen1==null){
                     this.setState({t1:moment()})
                 }else{
@@ -115,7 +121,7 @@ changeProblemePrincipale=(p)=>{
 
     }
     aspecteparticulare=(p)=>{
-        this.setState({aspecteparticulare:p})
+        this.setState({aspecteParticulare:p})
 
     }
 
@@ -123,7 +129,7 @@ changeProblemePrincipale=(p)=>{
 
         if(this.state.aspecteparticulare!=null) {
             axios
-                .put('Optiune/PutFisaPreliminaraStudent?ID_fisa_preliminara=' + fisa + '&Aspecte_particulare=' + this.state.aspecteparticulare)
+                .put('Optiune/PutFisaPreliminaraStudent?ID_fisa_preliminara=' + fisa + '&Aspecte_particulare=' + this.state.aspecteParticulare)
                 .then(re => {
                 console.log("Updatarile au fost efectuate")
             })
@@ -336,6 +342,16 @@ changeProblemePrincipale=(p)=>{
                             <TableCell>{e.NumeStudent} {e.PrenumeStudent}</TableCell>
                             <TableCell>{e.NumeCoordonator} {e.PrenumeCoordonator}</TableCell>
                             <TableCell>{e.NumeDirecorDepartament}</TableCell>
+                        </TableRow>
+                        <TableRow>
+
+                            <TableCell>
+                                <Semnatura
+                                    ID_fisa_preliminara={e.ID_fisa_preliminara}
+                                />
+                            </TableCell>
+                            <TableCell></TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                         </tbody>
                     </Table>
