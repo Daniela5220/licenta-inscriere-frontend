@@ -73,13 +73,25 @@ class FisaLucrarii extends Component {
                 Indrumator_semnat_data:null
             }
 
-        ]
+        ],
+        selectedFile:null
     }
     actualizareOptiuniDinState=(index,key,value)=>{
 
         let vizaCopy=[...this.state.viza]
         vizaCopy[index][key]=value;
         this.setState({vize:vizaCopy})
+    }
+    saveVize=()=>{
+        let optiuniCopy = [...this.state.viza]
+
+        // axios
+        //     .post('Optiune/Post?lista_optiuni',optiuniCopy)
+        //     .then(re => {
+        //
+        //         console.log('Optiunile  au fost adaugate');
+        //     })
+
     }
     handleChange=(e, { value }) =>{
         this.setState({ val1:value })
@@ -174,7 +186,7 @@ class FisaLucrarii extends Component {
                             <TableRow>
                                 <TableCell>
                                     <div>Probleme principale</div>
-                                    <TextArea className={'TextArea'} defaultValue={e.ProblemePrincipale}></TextArea>
+                                    <TextArea className={'TextArea'} defaultValue={e.Probleme_principale}></TextArea>
                                 </TableCell>
                             </TableRow>
                             <TableRow>

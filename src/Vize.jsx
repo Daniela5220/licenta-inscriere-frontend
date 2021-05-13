@@ -25,10 +25,26 @@ class Vize extends Component {
         super(props)
 
     }
+    state={
+        t4: moment(),
+    }
     alegeProblema=(Problema)=>{
         this.props.actualizareOptiuniDinState(this.props.index,"Tema_lucrare",Problema)
 
     }
+    alegeData=(Data)=>{
+        this.props.actualizareOptiuniDinState(this.props.index,"Data_vizei",Data)
+
+    }
+    onFileChange = event => {
+        // Update the state
+        this.setState({semnaturaStudentFile: event.target.files[0]});
+        console.log(event.target.files[0])
+        this.setState({
+            file: URL.createObjectURL(event.target.files[0])
+        })
+
+    };
 
     render(){
         return(
@@ -48,6 +64,17 @@ class Vize extends Component {
                {/*</TableRow>*/}
                <TableRow>
                    <TableCell >
+                       <SingleDatePicker
+
+                           date={moment(this.state.t4)}
+                           onDateChange={t4=>this.setState({t4})}
+                           displayFormat="DD/MM/YYYY"
+                           placeholder="Data"
+                           focused={this.state.focused4}
+                           onFocusChange={({focused:focused4})=>this.setState({focused4})}
+                           numberOfMonths={1}
+                           isOutsideRange={() => false}
+                       />
                    </TableCell>
                    <TableCell >
                        <Input className={"teme-textArea"}
@@ -56,6 +83,7 @@ class Vize extends Component {
                               placeholder={"Problema propusa"}/>
                    </TableCell>
                    <TableCell >
+                       <input type="file" onChange={this.onFileChange}/>
                    </TableCell>
                </TableRow>
            </Table>

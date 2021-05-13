@@ -52,12 +52,28 @@ class FisaPreliminara extends Component {
         focused:false,
         focused2:false,
         focused3:false,
-        focused4:false
+        focused4:false,
+        disabled:false,
+        disabled2:false,
+        disabled1:false,
+        selectedFile:null
 
     }
 
 
     componentDidMount() {
+        console.log(this.props.rol)
+        if(this.props.rol==2){
+            this.setState({disabled:true})
+        }
+        if(this.props.rol==0){
+            this.setState({disabled2:true})
+
+        }
+        if(this.props.rol==1){
+            this.setState({disabled:true})
+            this.setState({disabled2:true})
+        }
 
         axios
             .get('Optiune/GetStudentByUsernameAnUniv?StudentUsername=' +this.props.username + '&ID_AnUniv=' + this.props.ID_AnUniv)
@@ -106,6 +122,27 @@ class FisaPreliminara extends Component {
     })
 }
 
+    onFileChange = event => {
+        // Update the state
+        this.setState({selectedFile: event.target.files[0]});
+        console.log(event.target.files[0])
+        this.setState({
+            file: URL.createObjectURL(event.target.files[0])
+        })
+
+    };
+    fileData = () => {
+        if (this.state.selectedFile) {
+            return (
+                <div>
+                    <p>{/*Last Modified:{" "}*/}
+                        {/*{this.state.selectedFile.lastModifiedDate.toDateString()}*/}
+                        <object data={this.state.file} type="application/pdf" width="25%" height="25%"/>
+                    </p>
+                </div>
+            );
+        }
+    };
 
 changeProblemePrincipale=(p)=>{
     this.setState({problemePrincipale:p})
@@ -125,17 +162,7 @@ changeProblemePrincipale=(p)=>{
 
     }
 
-    updatebystudent=(fisa)=> {
 
-        if(this.state.aspecteparticulare!=null) {
-            axios
-                .put('Optiune/PutFisaPreliminaraStudent?ID_fisa_preliminara=' + fisa + '&Aspecte_particulare=' + this.state.aspecteParticulare)
-                .then(re => {
-                console.log("Updatarile au fost efectuate")
-            })
-
-        }
-    }
 
 
 
@@ -143,28 +170,67 @@ changeProblemePrincipale=(p)=>{
 
 
     update=(fisa, Probleme_principale)=>{
+    console.log("Macar vedem daca merge")
+        // Create an object of formData
+        const formData = new FormData();
+
+        // Update the formData object
+        formData.append(
+            "myFile",
+            this.state.selectedFile,
+            this.state.selectedFile.name
+        );
+
+        // Details of the uploaded file
+        console.log(this.state.selectedFile);
+
+        // Request made to the backend api
+        // Send formData object
+        console.log(formData)
+    if(this.props.rol==0){
+
+        axios
+            .post('Optiune/PutFisaPreliminara?ID_fisa_preliminara='+fisa+'&probleme_principale='+this.state.problemePrincipale+'&loc_durata='+this.state.locdurata+'&bibliografie='+this.state.bibliografie+'&Termen1='+this.state.t1.format('DD/MM/yyyy')+'&Termen2='+this.state.t2.format('DD/MM/yyyy')+'&Termen3='+this.state.t3.format('DD/MM/yyyy')+'&Termen4='+this.state.t4.format('DD/MM/yyyy'),formData)
+            .then(re=> {
+                console.log(re)
+                console.log("Updatarile au fost efectuate")
 
 
-        if(this.state.problemePrincipale==null||this.state.locdurata==null||this.state.bibliografie==null){
 
-            console.log("Nu ai comletat toate campurile")
+            })
 
-        }else{
-            console.log(this.state.t1.format('DD/MM/yyyy'));
 
+
+
+    }
+    if(this.props.rol==2){
+
+        if(this.state.aspecteParticulare!=null) {
+            console.log(this.state.aspecteParticulare)
             axios
-                .put('Optiune/PutFisaPreliminara?ID_fisa_preliminara='+fisa+'&probleme_principale='+this.state.problemePrincipale+'&loc_durata='+this.state.locdurata+'&bibliografie='+this.state.bibliografie+'&Termen1='+this.state.t1.format('DD/MM/yyyy')+'&Termen2='+this.state.t2.format('DD/MM/yyyy')+'&Termen3='+this.state.t3.format('DD/MM/yyyy')+'&Termen4='+this.state.t4.format('DD/MM/yyyy'))
-                .then(re=> {
+                .put('Optiune/PutFisaPreliminaraStudent?ID_fisa_preliminara=' + fisa + '&Aspecte_particulare=' + this.state.aspecteParticulare)
+                .then(re => {
                     console.log("Updatarile au fost efectuate")
-
-
-
                 })
+
         }
-        if(this.state.problemePrincipale==null){
-            console.log(Probleme_principale)
-            this.setState({problemePrincipale:Probleme_principale})
-        }
+        axios
+            .post('Optiune/PutSemnaturaStudent?ID_fisa_preliminara='+fisa,formData)
+            .then(re => {
+                console.log(re)
+
+            })
+
+    }
+    if(this.props.rol==1){
+        axios
+            .post('Optiune/PutFisaPreliminaraSemnaturaDirDepAdd?ID_fisa_preliminara='+fisa,formData)
+            .then(re => {
+                console.log(re)
+
+            })
+
+    }
 
     }
 
@@ -221,13 +287,17 @@ changeProblemePrincipale=(p)=>{
                     <tbody>
                     <TableRow>
                         <TableCell className={'fptrow'}>Tema lucrarii</TableCell>
-                        <TableCell colSpan={3}>
+                        <TableCell colSpan={3}
+                                   disabled = {(this.state.disabled)? "disabled" : ""}
+                        >
                             <TextArea className={'TextArea'} defaultValue={e.Tema_lucrare}></TextArea>
                         </TableCell>
                         </TableRow>
                            <TableRow>
                         <TableCell> Problemele principale care vor fi tratate:</TableCell>
-                               <TableCell colSpan={3}>
+                               <TableCell colSpan={3}
+                                          disabled = {(this.state.disabled)? "disabled" : ""}
+                               >
                                    <TextArea className={'TextArea'} defaultValue={e.Probleme_principale}
                                              onChange={((e, data) => this.changeProblemePrincipale(data.value))}
                                    ></TextArea>
@@ -235,7 +305,9 @@ changeProblemePrincipale=(p)=>{
                            </TableRow>
                     <TableRow>
                         <TableCell>Locul si durata practicii:</TableCell>
-                        <TableCell colSpan={3}>
+                        <TableCell colSpan={3}
+                                   disabled = {(this.state.disabled)? "disabled" : ""}
+                        >
                             <TextArea className={'TextArea'}
                                       defaultValue={e.Loc_durata}
                                       onChange={((e, data) => this.locdurata(data.value))}
@@ -244,8 +316,12 @@ changeProblemePrincipale=(p)=>{
                     </TableRow>
                     <TableRow>
                         <TableCell>Bibliografia recomandata:</TableCell>
-                        <TableCell colSpan={3}>
-                            <TextArea className={'TextArea'}
+                        <TableCell colSpan={3}
+                                   disabled = {(this.state.disabled)? "disabled" : ""}
+                        >
+                            <TextArea
+
+                                className={'TextArea'}
                                       defaultValue={e.Bibliografie}
                                       onChange={((e, data) => this.bibliografie(data.value))}
                             ></TextArea>
@@ -254,7 +330,9 @@ changeProblemePrincipale=(p)=>{
                     <TableRow>
                         <TableCell>Aspecte particulare privind lucrarea:</TableCell>
                         <TableCell colSpan={3}>
-                            <TextArea className={'TextArea'}
+                            <TextArea
+                                disabled = {(this.state.disabled2)? "disabled" : ""}
+                                className={'TextArea'}
                                       defaultValue={e.Aspecte_particulare}
                                       onChange={((e, data) => this.aspecteparticulare(data.value))}
                             ></TextArea>
@@ -267,7 +345,9 @@ changeProblemePrincipale=(p)=>{
                     <TableCell>Termen 4</TableCell>
                 </TableRow>
                     <TableRow>
-                        <TableCell>
+                        <TableCell
+                            disabled = {(this.state.disabled)? "disabled" : ""}
+                        >
 
 
                             <SingleDatePicker
@@ -285,7 +365,9 @@ changeProblemePrincipale=(p)=>{
                             />
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell
+                            disabled = {(this.state.disabled)? "disabled" : ""}
+                        >
                             <SingleDatePicker
 
                                 date={moment(this.state.t2)}
@@ -299,7 +381,9 @@ changeProblemePrincipale=(p)=>{
                             />
 
                         </TableCell>
-                        <TableCell>
+                        <TableCell
+                            disabled = {(this.state.disabled)? "disabled" : ""}
+                        >
                             <SingleDatePicker
 
                                 date={moment(this.state.t3)}
@@ -312,7 +396,9 @@ changeProblemePrincipale=(p)=>{
                                 isOutsideRange={() => false}
                             />
                         </TableCell>
-                        <TableCell>
+                        <TableCell
+                            disabled = {(this.state.disabled)? "disabled" : ""}
+                        >
                             <SingleDatePicker
 
                                 date={moment(this.state.t4)}
@@ -345,21 +431,33 @@ changeProblemePrincipale=(p)=>{
                         </TableRow>
                         <TableRow>
 
-                            <TableCell>
-                                <Semnatura
-                                    ID_fisa_preliminara={e.ID_fisa_preliminara}
-                                />
+                            <TableCell
+                                 disabled = {(this.state.disabled2)? "disabled" : ""}
+                            >
+                                <input type="file" onChange={this.onFileChange}/>
+
                             </TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
+                            <TableCell
+                                disabled = {(this.state.disabled)? "disabled" : ""}
+                            >
+                                <input type="file" onChange={this.onFileChange}/>
+
+                            </TableCell>
+                            <TableCell
+                                disabled = {(this.state.disabled1)? "disabled" : ""}
+                                disabled = {(this.state.disabled2)? "disabled" : ""}
+                            >
+                                <input type="file" onChange={this.onFileChange}/>
+
+                            </TableCell>
                         </TableRow>
                         </tbody>
                     </Table>
                 {/*<div>Data: {this.state.date}</div>*/}
 
-
                                 <Button className={"savebutton"} color='green' onClick={() => {this.update(e.ID_fisa_preliminara,e.Probleme_principale)}}>Save</Button>
-                                <Button className={"savebutton"} color='green' onClick={() => {this.updatebystudent(e.ID_fisa_preliminara)}}>SaveStud</Button>
+
+
 
                             </div>
 

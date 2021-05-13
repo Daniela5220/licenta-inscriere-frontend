@@ -13,10 +13,10 @@ class FisaPreliminariiIndrumatori extends Component {
     state = {
         ID_An:39,
         fisepreliminarii:[],
-        usernameprofesor:"maican@unitbv.ro",
         ID_AnUniv:39,
         username:null,
-        an:null
+        an:null,
+
 
 
     }
@@ -37,6 +37,7 @@ class FisaPreliminariiIndrumatori extends Component {
                     <FisaPreliminara
                         username={this.state.username}
                         ID_AnUniv={this.state.ID_AnUniv}
+                        rol={this.props.rol}
 
                     />
 
@@ -52,7 +53,7 @@ class FisaPreliminariiIndrumatori extends Component {
 
 
         axios
-            .get('Optiune/GetFisaPreliminaraListByProfesorUsername?Username='+this.state.usernameprofesor+'&ID_AnUniv='+this.state.ID_AnUniv)
+            .get('Optiune/GetFisaPreliminaraListByProfesorDirDepUsername?ID_AnUniv='+this.state.ID_AnUniv)
             .then(r => {
                 let fisepreliminarii = [];
                 for (let fisa of r.data) {

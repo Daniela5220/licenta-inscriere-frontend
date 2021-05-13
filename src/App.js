@@ -32,28 +32,49 @@ import FisaPreliminariiIndrumatori from "./FisaPreliminariiIndrumatori";
 import Vize from "./Vize";
 import FisaLucrarii from "./FisaLucrarii";
 import Semnatura from "./Semnatura";
+import axios from "./axios-API";
 
 class App extends Component {
     state={
         username:'maican@unitbv.ro',
-        ID_AnUniv:39
+        ID_AnUniv:39,
+
+
+    }
+
+    componentDidMount() {
+        axios
+            .get('Optiune/Rol')
+            .then(re => {
+                this.setState({rol: re.data});
+                console.log(this.state.rol)
+            })
+
+
     }
     fisapreliminaraacces=()=>{
 
-        if(this.state.username==='maican@unitbv.ro'){
+        console.log(this.state.rol)
+
+        if(this.state.rol==0||this.state.rol==1){
             return(
-                <FisaPreliminariiIndrumatori/>
+                <FisaPreliminariiIndrumatori
+                rol={this.state.rol}
+                />
                 )
 
 
-        }else{
+        }
+        if(this.state.rol==2){
             return(
                 <FisaPreliminara
                     username={this.state.username}
                     ID_AnUniv={this.state.ID_AnUniv}
+                    rol={this.state.rol}
                 />
             )
         }
+
     }
 
   render() {
