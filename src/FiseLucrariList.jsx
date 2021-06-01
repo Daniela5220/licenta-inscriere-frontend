@@ -1,22 +1,36 @@
 import React, {Component} from 'react'
-import {Button, Dropdown, Menu, MenuItem, Table, TextArea, Modal, Dimmer, Loader} from "semantic-ui-react";
+import {
+    Button,
+    Dropdown,
+    Menu,
+    MenuItem,
+    Table,
+    TextArea,
+    Modal,
+    Dimmer,
+    Loader,
+    Segment,
+    Image
+} from "semantic-ui-react";
 import Style from './Style.css';
 import axios from "./axios-API"
 import FisaPreliminara from "./FisaPreliminara"
+import FisaLucrarii from "./FisaLucrarii";
 
 const optiune = {}
 let i=0;
 let idstud=0;
-class FisaPreliminariiIndrumatori extends Component {
+class FiseLucrariList extends Component {
 
 
     state = {
         ID_An:39,
-        fisepreliminarii:[],
+
         ID_AnUniv:39,
-        username:null,
+        usernameStudent:null,
         an:null,
-        showResults:true
+        showResults:true,
+        fiselucrari:[]
 
 
 
@@ -24,12 +38,13 @@ class FisaPreliminariiIndrumatori extends Component {
 
     afisare=()=>{
         console.log(idstud)
-        console.log(this.state.username)
+        console.log(this.state.usernameStudent)
 
-        if(this.state.username==null){
+        if(this.state.usernameStudent==null){
             return(
+
                 <div>
-                    <Loader active inline='centered'>Loading</Loader>
+                            <Loader active inline='centered'>Loading</Loader>
                 </div>
 
             )
@@ -37,13 +52,13 @@ class FisaPreliminariiIndrumatori extends Component {
             return(
 
                 <div>
-
-                    <FisaPreliminara
-                        username={this.state.username}
+                    {console.log("Retureneaza ceva")}
+                    <FisaLucrarii
+                        usernameStudent={this.state.usernameStudent}
                         ID_AnUniv={this.state.ID_AnUniv}
-                        rol={this.props.rol}
-
                     />
+                    {console.log("Unde e problema")}
+
 
                 </div>
 
@@ -57,12 +72,12 @@ class FisaPreliminariiIndrumatori extends Component {
 
 
         axios
-            .get('Optiune/GetFisaPreliminaraListByProfesorDirDepUsername?ID_AnUniv='+this.state.ID_AnUniv)
+            .get('Optiune/GetFisaLucrareListByProfesorDirDepUsername?ID_AnUniv=39')
             .then(r => {
-                let fisepreliminarii = [];
+                let fiselucrari = [];
                 for (let fisa of r.data) {
-                    fisepreliminarii.push({
-                        key: fisa.ID_fisa_preliminara,
+                    fiselucrari.push({
+                        key: fisa.ID_fisa_lucrare_absolvire,
                         value:fisa.ID_student,
                         text: fisa.PrenumeStudent
 
@@ -70,18 +85,18 @@ class FisaPreliminariiIndrumatori extends Component {
 
                     })
                 }
-                this.setState({fisepreliminarii: fisepreliminarii})
-                idstud=this.state.fisepreliminarii[i].value
-               {this.seteazaUsername(idstud)}
+                this.setState({fiselucrari: fiselucrari})
+                idstud=this.state.fiselucrari[i].value
+                {this.seteazaUsername(idstud)}
 
 
             });
     }
-     next=()=> {
+    next=()=> {
 
-        if(i+1<this.state.fisepreliminarii.length) {
+        if(i+1<this.state.fiselucrari.length) {
             i = i + 1
-            idstud = this.state.fisepreliminarii[i].value
+            idstud = this.state.fiselucrari[i].value
 
             {
                 this.seteazaUsername(idstud)
@@ -91,14 +106,15 @@ class FisaPreliminariiIndrumatori extends Component {
 
         }
 
-     }
+    }
     componentDidUpdate(prevProps, prevState) {
         if (
-            prevState.username !== this.state.username &&
-            prevState.username !== null
+            prevState.usernameStudent !== this.state.usernameStudent &&
+            prevState.usernameStudent !== null
         ) {
 
             this.afisare();
+
         }
 
     }
@@ -108,7 +124,7 @@ class FisaPreliminariiIndrumatori extends Component {
     back=()=>{
         if(i>=1) {
             i=i-1
-            idstud=this.state.fisepreliminarii[i].value
+            idstud=this.state.fiselucrari[i].value
             {this.seteazaUsername(idstud)}
 
         }else{
@@ -122,9 +138,9 @@ class FisaPreliminariiIndrumatori extends Component {
             .get('Optiune/GetStudentUsernameByID?ID_Student=' + IDStudent)
             .then(rez => {
                 this.setState({
-                    username: rez.data
+                    usernameStudent: rez.data
                 })
-                console.log(this.state.username)
+
             })
 
 
@@ -139,18 +155,15 @@ class FisaPreliminariiIndrumatori extends Component {
         return (
 
             <div className={"body"}>
-                <h1>Fise preliminarii</h1>
-                {
-                    this.state.showResults? <div>Test</div>  : null
-                }
+
                 <Menu
                     borderless inverted color={'grey'}>
                     <MenuItem>
                         <Dropdown
 
                             searchInput={{ type: 'string' }}
-                            placeholder='Alege fisa preliminara'
-                            search selection   options={this.state.fisepreliminarii}
+                            placeholder='Alege fisa lucrării'
+                            search selection   options={this.state.fiselucrari}
                             onChange={((e, data) => this.seteazaUsername(data.value))}
 
                         />
@@ -177,4 +190,4 @@ class FisaPreliminariiIndrumatori extends Component {
         )}
 }
 
-export default FisaPreliminariiIndrumatori;
+export default FiseLucrariList;

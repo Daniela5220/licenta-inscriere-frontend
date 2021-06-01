@@ -27,7 +27,7 @@ alegeTema=(TemaAleasa)=>{
     render(){
         return(
             <div>
-            <div>Optiune student</div>
+
                 <div>Tema </div>
                 <Input className={"teme-textArea"}
                        onChange={((e, data) => this.alegeTema(data.value))}

@@ -17,7 +17,9 @@ class DepuneCerere extends Component {
         selectedOption: null,
        semnaturaStudentFile:null,
         ID_student: null,
-        ID_AnUniv: 39,
+
+        AnUniv:[],
+        ID_AnUnivInscriere:null,
         ID_facultate: null,
         listat: [],
         optiuni: [
@@ -73,7 +75,9 @@ class DepuneCerere extends Component {
             );
         }
     };
-
+        changeAnInscriere=(An)=>{
+            this.setState({ID_AnUnivInscriere:An})
+        }
     savefunction = () => {
         // Create an object of formData
         const formData = new FormData();
@@ -94,7 +98,7 @@ class DepuneCerere extends Component {
 
         //Adaugam in baza de date o cerere
         axios
-            .post('Optiune/PostCerere?Sesiune='+this.state.sesiuneAleasa+'&ID_AnUnivCerereInscriere=39',formData)
+            .post('Optiune/PostCerere?Sesiune='+this.state.sesiuneAleasa+'&ID_AnUnivCerereInscriere='+this.state.ID_AnUnivInscriere,formData)
             .then(rez=>{
                 console.log('Cererea a fost creeata , sa vedem daca merge')
             })
@@ -116,7 +120,24 @@ class DepuneCerere extends Component {
 
     componentDidMount() {
         axios
-            .get('Optiune/GetStudentByUsernameAnUniv?ID_AnUniv=' + this.state.ID_AnUniv)
+            .get('Optiune/AnUnivLista')
+
+            .then(r => {
+                let AnUniv = [];
+                for (let an of r.data) {
+                    AnUniv.push({
+                        key: an.ID_AnUniv,
+                        value: an.ID_AnUniv,
+                        text: an.Denumire
+
+
+                    })
+                }
+                this.setState({AnUniv: AnUniv})
+                this.setState({ID_AnUnivInscriere:r.data[0].ID_AnUniv})
+
+        axios
+            .get('Optiune/GetStudentByUsernameAnUniv?ID_AnUniv=' + this.state.ID_AnUnivInscriere)
             .then(re => {
                 this.setState({
                     Student: re.data
@@ -133,7 +154,7 @@ class DepuneCerere extends Component {
 
 
                 axios
-                    .get('Optiune/GetProfesoriList?ID_AnUniv=' + this.state.ID_AnUniv + '&ID_facultate=' + this.state.ID_facultate)
+                    .get('Optiune/GetProfesoriList?ID_AnUniv=' + this.state.ID_AnUnivInscriere + '&ID_facultate=' + this.state.ID_facultate)
 
                     .then(r => {
                         let listaProfesori = [];
@@ -153,7 +174,7 @@ class DepuneCerere extends Component {
 
 
         axios
-            .get('Optiune/GetSesiune')
+            .get('Optiune/SesiuneList')
 
             .then(r => {
                 let Sesiune = [];
@@ -167,6 +188,8 @@ class DepuneCerere extends Component {
                     })
                 }
                 this.setState({Sesiune: Sesiune})
+            });
+
             });
 
 
@@ -196,25 +219,37 @@ class DepuneCerere extends Component {
                         <div key={e.ID_Student}>
                             <div>FACULTATEA {e.DenumireFacultate} </div>
 
-                            <div>ABSOLVIRE/LICENTA, anul</div>
+                            <div>ABSOLVIRE/LICENTA, anul
+                                <Dropdown
+
+                                    searchInput={{ type: 'string' }}
+                                    placeholder='Alege an licenta'
+                                    search selection   options={this.state.AnUniv}
+                                    defaultValue={this.state.AnUniv[0].value}
+
+                                    onChange={((e, data) => this.changeAnInscriere(data.value))}
+                                />
+
+                            </div>
+                            <div>SESIUNEA:
+                                <Dropdown
+
+                                    searchInput={{ type: 'string' }}
+                                    placeholder='Alege sesiune '
+                                    search selection   options={this.state.Sesiune}
+
+                                    onChange={((e, data) => this.alegeSesiune(data.value))}
+                                /></div>
 
 
                             <h1>CERERE DE ALEGERE A TEMEI DE LICENTA SI A CADRULUI DIDACTIC INDRUMATOR</h1>
                             <div className={"cr-text"}>Subsemnatul(a) {e.Nume} {e.Prenume} student(a)/absolvent(a) al(a)
                                 programului de studii {e.DenumireSpecializare}, grupa {e.DenumireGrupa} forma de
-                                invatamant {e.DenumireFormaInv}, doresc sa realizez LUCRAREA DE LICENTA in sesiunea
+                                invatamant {e.DenumireFormaInv}, doresc sa realizez LUCRAREA DE LICENTA cu
                             </div>
-                            <div>
-                                <Dropdown
 
-                                    searchInput={{ type: 'string' }}
-                                    placeholder='Alege profesor coordonator'
-                                    search selection   options={this.state.Sesiune}
 
-                                     onChange={((e, data) => this.alegeSesiune(data.value))}
-                                />
 
-                            </div>
 
                             {this.state.optiuni.map((item, index) => {
                                 return (

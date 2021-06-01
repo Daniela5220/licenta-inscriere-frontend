@@ -4,26 +4,20 @@ import Style from './Style.css';
 import {Dropdown, Input, TableBody} from "semantic-ui-react";
 import {Table, Select, Button} from "semantic-ui-react";
 import axios from "./axios-API"
+import moment from "moment";
 
 //var selectedOption=null;
-const d =new Date();
-d.setMonth(1,10);
-const d1 =new Date();
-d1.setMonth(1,9);
-const d2 =new Date();
-d2.setMonth(1,12);
-const d3 =new Date();
-d3.setMonth(1,15);
-const d4 =new Date();
-d4.setMonth(1,20);
 
 
 
+
+
+var Nr_Optiune
 
 class AlegeStudent extends Component {
 
     state = {
-        username: "maican@unitbv.ro",
+
         ID_AnUniv: 39,
         listaCereri: [],
         idStatusNou:null,
@@ -36,8 +30,15 @@ class AlegeStudent extends Component {
 
 
     componentDidMount() {
+        axios
+            .get('Optiune/GetTermene')
+            .then(rez=>{
 
-                const Nr_Optiune= this.seteazanroptiune(this.state.Nr_op);
+
+
+
+                 Nr_Optiune= this.seteazanroptiune(this.state.Nr_op,rez.data[0].Termen1,rez.data[0].Termen2,rez.data[0].Termen3,rez.data[0].Termen4);
+                console.log(Nr_Optiune)
 
             axios
 
@@ -64,6 +65,7 @@ class AlegeStudent extends Component {
                 this.setState({listaStatus: listaStatus})
 
             });
+            })
     }
     componentDidUpdate(prevProps, prevState) {
         if (
@@ -75,19 +77,23 @@ class AlegeStudent extends Component {
         }
 
     }
-    seteazanroptiune = (op) => {
-        console.log(op)
+    seteazanroptiune = (op,d1,d2,d3,d4) => {
+        var m = moment()
+        var a = moment(d1)
+        var b = moment(d2)
+        var c = moment(d3)
+        var d = moment(d4)
+
+
         if (op != null) {
             this.setState({Nr_op: op})
             return op
         } else {
-
-
-            if (d1 <= d && d < d2) {
+            if (a<=m&&m<b) {
                 return 1
-            } else if (d2 <= d && d < d3) {
+            } else if (b<=m&&m<c) {
                 return 2
-            } else if (d3 <= d && d <= d4) {
+            } else if (c<=m&&m<d) {
                 return 3
             } else {
                 console.log("In acesta perioada nu se pot actualiza statusurile optiunilor")
@@ -95,6 +101,7 @@ class AlegeStudent extends Component {
             }
         }
     }
+
 
 
 
@@ -156,7 +163,21 @@ class AlegeStudent extends Component {
                         }
 
                         )}
-                const Nr_Optiune= this.seteazanroptiune(this.state.Nr_op);
+                if(this.state.idStatusNou==2) {
+                    axios
+                        .delete('Optiune/DeleteFisaLucrareAbsolvire?ID_student='+ID_student)
+                        .then(re=>{
+                            console.log("Fisa lucrarii a fost stearsa")
+                        })
+                    axios
+                        .delete('Optiune/DeleteFisaPreliminara?ID_optiune='+varop)
+                        .then(re=>{
+                            console.log("Fisa preliminara a fost stearsa")
+                        })
+
+
+                }
+
                 axios
 
                     .get('Optiune/GetOptiuniListByProfesorUsername?ID_An=' + this.state.ID_AnUniv +'&Nr_optiune='+Nr_Optiune)

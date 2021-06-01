@@ -40,7 +40,6 @@ class FisaPreliminara extends Component {
     }
     state ={
         // date: date,
-        username:'octavian.dorvos@student.unitbv.ro',
        ID_facultate:null,
         ID_AnUniv:39,
         Fisa:[],
@@ -76,8 +75,9 @@ class FisaPreliminara extends Component {
         }
 
         axios
-            .get('Optiune/GetStudentByUsernameAnUniv?StudentUsername=' +this.props.username + '&ID_AnUniv=' + this.props.ID_AnUniv)
+            .get('Optiune/GetStudentByUsernameAnUniv?username=' +this.props.username + '&ID_AnUniv=' + this.props.ID_AnUniv)
             .then(re => {
+                console.log(re.data)
                 this.setState({
                     ID_facultate: re.data[0].ID_Facultate
 
@@ -280,7 +280,7 @@ changeProblemePrincipale=(p)=>{
                                 </tbody>
 
                 </Table>
-                <h1>FIŞA PRELIMINARĂ A LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENŢĂ/
+                <h1>FIŞA PRELIMINARĂ A LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENTĂ/
                             PROIECTULUI DE DIPLOMĂ/ DISERTAŢTIE
                         </h1>
                 <Table >
@@ -444,8 +444,8 @@ changeProblemePrincipale=(p)=>{
 
                             </TableCell>
                             <TableCell
-                                disabled = {(this.state.disabled1)? "disabled" : ""}
-                                disabled = {(this.state.disabled2)? "disabled" : ""}
+                                disabled = {(this.state.disabled)? "disabled" : ""}
+
                             >
                                 <input type="file" onChange={this.onFileChange}/>
 

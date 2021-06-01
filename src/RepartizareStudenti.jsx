@@ -19,18 +19,20 @@ class RepartizareStudenti extends Component {
     }
     componentDidMount() {
         axios
-            .get('Optiune/GetSpecializariListBySefCatedraCoordonatoare?UsernameSefCatedra=tiberiu.foris@unitbv.ro&ID_AnUniv=39')
+            .get('Optiune/GetStudentiNeacceptatiListByUsernameProfesorCoordonatorSpecializare')
             .then(response => {
-                let Specializari = [];
-                for (let specializari of response.data) {
-                    Specializari.push({
-                        key: specializari.ID_Specializare,
-                        value: specializari.ID_Specializare,
-                        text: specializari.DenumireSpecializare
+                let Stud = [];
+                for (let studenti of response.data) {
+                    Stud.push({
+                        key: studenti.ID_student,
+                        value: studenti.ID_student,
+                        text: studenti.NumeIntreg,
+                        facultate:studenti.ID_Facultate
 
                     })
                 }
-                this.setState({Specializari: Specializari})
+                this.setState({Stud: Stud})
+
 
             });
 
@@ -54,29 +56,7 @@ class RepartizareStudenti extends Component {
             })
 
     }
-    alegeSpecializare =(prop)=>{
-        this.setState({ID_specializare:prop})
-        console.log(this.state.ID_specializare)
-        axios
-            .get('Optiune/GetStudentiNeacceptatiListBySpecializare?ID_specializare='+prop)
-            .then(response => {
-                let Stud = [];
-                for (let studenti of response.data) {
-                    Stud.push({
-                        key: studenti.ID_student,
-                        value: studenti.ID_student,
-                        text: studenti.NumeIntreg,
-                        facultate:studenti.ID_Facultate
 
-                    })
-                }
-                this.setState({Stud: Stud})
-
-
-            });
-
-
-    }
     alegeStud =(prop,facultate)=>{
 
         this.setState({ID_student:prop})
@@ -105,18 +85,8 @@ class RepartizareStudenti extends Component {
                 <Menu borderless inverted color={'green'}>
 
                     <MenuItem>
-                <Dropdown  className={"dropdownr"}
 
-                    searchInput={{ type: 'string' }}
-                    placeholder='Alege specializare'
-                    search selection   options={this.state.Specializari}
-                    onChange={((e, data) => this.alegeSpecializare(data.value))}
-                />
-                </MenuItem>
-
-                    <MenuItem>
-
-                <Dropdown  className={"dropdownr"}
+                <Dropdown className={"dropdown-r"}
 
                     searchInput={{ type: 'string' }}
                     placeholder='Alege student'
@@ -131,7 +101,7 @@ class RepartizareStudenti extends Component {
                 <Input  className={"teme-textArea"} onChange={((e, data) => this.seteazaTema(data.value))} />
 
                 <div>Cadrul didactic indrumator</div>
-                <Dropdown className={"dropdownr"}
+                <Dropdown className={"dropdown-r"}
                     search
                     searchInput={{ type: 'string' }}
                     placeholder='Alege profesor coordonator'

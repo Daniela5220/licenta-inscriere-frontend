@@ -33,16 +33,23 @@ import Vize from "./Vize";
 import FisaLucrarii from "./FisaLucrarii";
 import Semnatura from "./Semnatura";
 import axios from "./axios-API";
-
+import FiseLucrariList from "./FiseLucrariList";
+import SetariDate from "./SetariDate";
 class App extends Component {
     state={
-        username:'maican@unitbv.ro',
+        username:null,
         ID_AnUniv:39,
 
 
     }
 
     componentDidMount() {
+        axios
+            .get('Optiune/GetUsername')
+            .then(re => {
+                this.setState({username: re.data});
+                console.log(this.state.username)
+            })
         axios
             .get('Optiune/Rol')
             .then(re => {
@@ -76,17 +83,48 @@ class App extends Component {
         }
 
     }
+    fisalucrareafisare=()=>{
+        console.log(this.state.rol)
+        if(this.state.rol==0||this.state.rol==1){
+            return(
+                <FiseLucrariList
+                    rol={this.state.rol}
+                />
+            )
+
+
+        }
+        if(this.state.rol==2){
+            return(
+                <FisaLucrarii
+                    usernameStudent={this.state.username}
+                    ID_AnUniv={this.state.ID_AnUniv}
+                    rol={this.state.rol}
+                />
+
+            )
+        }
+
+
+        }
+
+
+
 
   render() {
     return (
         <div>
+            {/*<DepuneCerere/>*/}
+            {/*<AlegeStudent/>/!**!/*/}
+            {/*<RepartizareStudenti/>*/}
+            {/*{this.fisapreliminaraacces()}*/}
+            {/*<FiseLucrariList/>*/}
+            {this.fisalucrareafisare()}
+            {/*<SetariDate/>*/}
 
-            {this.fisapreliminaraacces()}
-            {/*<FisaLucrarii/>*/}
-          {/*<Semnatura/>*/}
-          {/*<RepartizareStudenti/>*/}
-          {/*<DepuneCerere/>*/}
-          {/*<AlegeStudent/>*/}
+
+
+
 
         </div>
     )
