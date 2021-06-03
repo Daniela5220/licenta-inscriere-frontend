@@ -34,16 +34,21 @@ import FisaLucrarii from "./FisaLucrarii";
 import Semnatura from "./Semnatura";
 import axios from "./axios-API";
 import FiseLucrariList from "./FiseLucrariList";
-import SetariDate from "./SetariDate";
+
 class App extends Component {
     state={
         username:null,
-        ID_AnUniv:39,
+        ID_AnUniv:null,
 
 
     }
 
     componentDidMount() {
+        axios
+            .get('Optiune/AnUnivCurent')
+            .then(re=> {
+                this.setState({ID_AnUniv: re.data[0].ID_AnUniv})
+            } )
         axios
             .get('Optiune/GetUsername')
             .then(re => {
@@ -114,13 +119,13 @@ class App extends Component {
   render() {
     return (
         <div>
-            {/*<DepuneCerere/>*/}
-            {/*<AlegeStudent/>/!**!/*/}
+            <DepuneCerere/>
+            {/*<AlegeStudent/>*/}
             {/*<RepartizareStudenti/>*/}
             {/*{this.fisapreliminaraacces()}*/}
             {/*<FiseLucrariList/>*/}
-            {this.fisalucrareafisare()}
-            {/*<SetariDate/>*/}
+            {/*{this.fisalucrareafisare()}*/}
+
 
 
 

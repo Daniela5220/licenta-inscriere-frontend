@@ -68,6 +68,7 @@ class RezultatSustinereLicenta extends Component {
                     })
                 }
                 this.setState({listaSefComisie: listaSefComisie})
+                console.log(listaSefComisie)
             });
         axios
             .get('Optiune/GetSesiune?ID_student=' + this.props.ID_Student + '&ID_AnUniv=' + this.props.ID_AnUniv)
@@ -84,7 +85,10 @@ class RezultatSustinereLicenta extends Component {
                 if(rez.data.length!=0) {
                     console.log(rez.data)
                     this.setState({media:rez.data[0].Media})
-                    this.setState({SefComisie:rez.data[0].ID_presedinte_comisie})
+                    this.setState({SefComisie:{key:rez.data[0].ID_presedinte_comisie,value:rez.data[0].ID_presedinte_comisie, text:rez.data[0].NumePresedinteComisie+' '+rez.data[0].PrenumePresedinteComisie}});
+                        console.log(rez.data[0].ID_presedinte_comisie)
+                        console.log(rez.data[0].NumePresedinteComisie+' '+rez.data[0].PrenumePresedinteComisie)
+
 
                     if(rez.data[0].Status_rezultat=="ADMIS"){
                         this.setState({rezultat:1})
@@ -120,7 +124,12 @@ class RezultatSustinereLicenta extends Component {
         // Send formData object
         console.log(formData)
         axios
-            .post('Optiune/PostRezultatSustinereLicenta?Media='+this.state.media+'&Sesiune='+this.state.sesiune+'&ID_status_rezultat='+this.state.rezultat+'&ID_presedinte_comisie='+this.state.SefComisie+'&ID_fisa_lucrare_absolvire='+this.props.ID_fisa_lucrare_absolvire,formData);
+            .post('Optiune/PostRezultatSustinereLicenta?Media='+this.state.media+'&Sesiune='+this.state.sesiune+'&ID_status_rezultat='+this.state.rezultat+'&ID_presedinte_comisie='+this.state.SefComisie+'&ID_fisa_lucrare_absolvire='+this.props.ID_fisa_lucrare_absolvire,formData)
+            .then(rez=>{
+                console.log("REZULTAT ADAUGAT")
+            }
+
+        )
     }
     alegeSefComisie=(sefcomisie)=>{
         this.setState({SefComisie: sefcomisie})
@@ -135,6 +144,9 @@ class RezultatSustinereLicenta extends Component {
 
         return(
             <div >
+                {this.state.rezultatelicenta.map((e, index) => {
+                    return(
+
                 <Table>
                     <TableHeader>
                         <TableHeaderCell colSpan={3}>
@@ -210,13 +222,16 @@ class RezultatSustinereLicenta extends Component {
                                 searchInput={{ type: 'string' }}
                                 placeholder='Alege SefComisie '
                                 search selection   options={this.state.listaSefComisie}
-
-                                defaultValue={this.state.SefComisie}
+                                    value={this.state.SefComisie&&this.state.SefComisie.value}
+                                defaultValue={this.state.SefComisie&&this.state.SefComisie.value}
                                 onChange={((e, data) => this.alegeSefComisie(data.value))}
                             />
                         </TableCell>
                         <TableCell>
-                            <input type="file" onChange={this.onFileChange}/>
+                            {e.Semnatura_presedinte_comisie==null? <input type="file" onChange={this.onFileChange}/>: <object
+                                style={{width: '100pt', height: '75pt'}}
+                                data={'data:application/pdf;base64,' + e.Semnatura_presedinte_comisie}></object>
+                            }
                         </TableCell>
                     </TableRow>
                     </tbody>
@@ -225,7 +240,7 @@ class RezultatSustinereLicenta extends Component {
                         this.save()
                     }}>Save</Button>
                 </Table>
-
+                        )})}
             </div>
 
 

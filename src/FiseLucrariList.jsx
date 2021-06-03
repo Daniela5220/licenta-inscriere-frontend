@@ -72,7 +72,7 @@ class FiseLucrariList extends Component {
 
 
         axios
-            .get('Optiune/GetFisaLucrareListByProfesorDirDepUsername?ID_AnUniv=39')
+            .get('Optiune/GetFisaLucrareListByProfesorUsernameAnUniv?ID_AnUniv=39')
             .then(r => {
                 let fiselucrari = [];
                 for (let fisa of r.data) {

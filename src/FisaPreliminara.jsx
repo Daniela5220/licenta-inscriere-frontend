@@ -41,7 +41,7 @@ class FisaPreliminara extends Component {
     state ={
         // date: date,
        ID_facultate:null,
-        ID_AnUniv:39,
+
         Fisa:[],
         problemePrincipale:null,
         locdurata:null,
@@ -52,12 +52,16 @@ class FisaPreliminara extends Component {
         focused2:false,
         focused3:false,
         focused4:false,
+        focused5:false,
         disabled:false,
         disabled2:false,
         disabled1:false,
         selectedFile:null
 
     }
+
+
+
 
 
     componentDidMount() {
@@ -75,7 +79,7 @@ class FisaPreliminara extends Component {
         }
 
         axios
-            .get('Optiune/GetStudentByUsernameAnUniv?username=' +this.props.username + '&ID_AnUniv=' + this.props.ID_AnUniv)
+            .get('Optiune/GetStudentByUsernameAnUniv?username=' +this.props.username)
             .then(re => {
                 console.log(re.data)
                 this.setState({
@@ -84,7 +88,7 @@ class FisaPreliminara extends Component {
                 })
 
                 axios
-            .get('Optiune/GetFisaPreliminara?StudentUsername='+this.props.username+'&ID_Facultate='+this.state.ID_facultate+'&ID_An='+this.props.ID_AnUniv)
+            .get('Optiune/GetFisaPreliminara?StudentUsername='+this.props.username+'&ID_Facultate='+this.state.ID_facultate)
             .then(rez => {
                 this.setState({
                     Fisa: rez.data
@@ -131,18 +135,18 @@ class FisaPreliminara extends Component {
         })
 
     };
-    fileData = () => {
-        if (this.state.selectedFile) {
-            return (
-                <div>
-                    <p>{/*Last Modified:{" "}*/}
-                        {/*{this.state.selectedFile.lastModifiedDate.toDateString()}*/}
-                        <object data={this.state.file} type="application/pdf" width="25%" height="25%"/>
-                    </p>
-                </div>
-            );
-        }
-    };
+    // fileData = () => {
+    //     if (this.state.selectedFile) {
+    //         return (
+    //             <div>
+    //                 <p>{/*Last Modified:{" "}*/}
+    //                     {/*{this.state.selectedFile.lastModifiedDate.toDateString()}*/}
+    //                     <object data={this.state.file} type="application/pdf" width="25%" height="25%"/>
+    //                 </p>
+    //             </div>
+    //         );
+    //     }
+    // };
 
 changeProblemePrincipale=(p)=>{
     this.setState({problemePrincipale:p})
@@ -161,47 +165,23 @@ changeProblemePrincipale=(p)=>{
         this.setState({aspecteParticulare:p})
 
     }
-
-
-
-
-
-
-
-
     update=(fisa, Probleme_principale)=>{
-    console.log("Macar vedem daca merge")
-        // Create an object of formData
-        const formData = new FormData();
 
-        // Update the formData object
+        const formData = new FormData();
         formData.append(
             "myFile",
             this.state.selectedFile,
             this.state.selectedFile.name
         );
 
-        // Details of the uploaded file
-        console.log(this.state.selectedFile);
-
-        // Request made to the backend api
-        // Send formData object
-        console.log(formData)
     if(this.props.rol==0){
 
         axios
-            .post('Optiune/PutFisaPreliminara?ID_fisa_preliminara='+fisa+'&probleme_principale='+this.state.problemePrincipale+'&loc_durata='+this.state.locdurata+'&bibliografie='+this.state.bibliografie+'&Termen1='+this.state.t1.format('DD/MM/yyyy')+'&Termen2='+this.state.t2.format('DD/MM/yyyy')+'&Termen3='+this.state.t3.format('DD/MM/yyyy')+'&Termen4='+this.state.t4.format('DD/MM/yyyy'),formData)
+            .post('Optiune/PutFisaPreliminara?ID_fisa_preliminara='+fisa+'&probleme_principale='+this.state.problemePrincipale+'&loc_durata='+this.state.locdurata+'&bibliografie='+this.state.bibliografie+'&Termen1='+this.state.t1.format('DD/MM/yyyy')+'&Termen2='+this.state.t2.format('DD/MM/yyyy')+'&Termen3='+this.state.t3.format('DD/MM/yyyy')+'&Termen4='+this.state.t4.format('DD/MM/yyyy'),this.state.t5,formData)
             .then(re=> {
                 console.log(re)
                 console.log("Updatarile au fost efectuate")
-
-
-
             })
-
-
-
-
     }
     if(this.props.rol==2){
 
@@ -227,17 +207,9 @@ changeProblemePrincipale=(p)=>{
             .post('Optiune/PutFisaPreliminaraSemnaturaDirDepAdd?ID_fisa_preliminara='+fisa,formData)
             .then(re => {
                 console.log(re)
-
-            })
-
-    }
-
-    }
-
-
-
-
-    componentDidUpdate(prevProps, prevState) {
+            })}
+}
+componentDidUpdate(prevProps, prevState) {
         if (
             prevProps.username !== this.props.username &&
             prevProps.username !== null
@@ -266,7 +238,7 @@ changeProblemePrincipale=(p)=>{
                     </TableRow>
                     <TableRow>
                         <TableCell>Programul de studiu: {e.DenumireSpecializare}</TableCell>
-                        <TableCell>Anul universitar:</TableCell>
+                        <TableCell>Anul universitar: {e.DenumireAnUniv}</TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell>Candidat:{e.NumeStudent} {e.PrenumeStudent}</TableCell>
@@ -415,7 +387,17 @@ changeProblemePrincipale=(p)=>{
                     </tbody>
 
             </Table>
-                <div>Termenul de predare a lucrarii</div>
+                <div>Termenul de predare a lucrarii <SingleDatePicker
+
+                    date={moment(this.state.t5)}
+                    onDateChange={t5=>this.setState({t5})}
+                    displayFormat="DD/MM/YYYY"
+                    placeholder="Data"
+                    focused={this.state.focused5}
+                    onFocusChange={({focused:focused5})=>this.setState({focused5})}
+                    numberOfMonths={1}
+                    isOutsideRange={() => false}
+                /></div>
                                 <div>Sematuri:</div>
                     <Table>
                         <TableHeader>
@@ -434,20 +416,33 @@ changeProblemePrincipale=(p)=>{
                             <TableCell
                                  disabled = {(this.state.disabled2)? "disabled" : ""}
                             >
-                                <input type="file" onChange={this.onFileChange}/>
+                                {e.Student_img_sem==null? <input type="file" onChange={this.onFileChange}/>: <object
+                                    style={{width: '80pt', height: '60pt'}}
+                                    data={'data:application/pdf;base64,' + e.Student_img_sem}></object>
 
-                            </TableCell>
-                            <TableCell
-                                disabled = {(this.state.disabled)? "disabled" : ""}
-                            >
-                                <input type="file" onChange={this.onFileChange}/>
+                                }
 
                             </TableCell>
                             <TableCell
                                 disabled = {(this.state.disabled)? "disabled" : ""}
 
                             >
-                                <input type="file" onChange={this.onFileChange}/>
+                                {e.Indrumator_img_sem==null? <input type="file" onChange={this.onFileChange}/>: <object
+                                    style={{width: '80pt', height: '60pt'}}
+                                    data={'data:application/pdf;base64,' + e.Indrumator_img_sem}></object>
+
+                                }
+
+                            </TableCell>
+                            <TableCell
+                                disabled = {(this.state.disabled2)? "disabled" : ""}
+
+                            >
+                                {e.Director_departament_img_sem==null? <input type="file" onChange={this.onFileChange}/>: <object
+                                    style={{width: '80pt', height: '60pt'}}
+                                    data={'data:application/pdf;base64,' + e.Director_departament_img_sem}></object>
+
+                                }
 
                             </TableCell>
                         </TableRow>

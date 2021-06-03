@@ -31,33 +31,37 @@ class Vize extends Component {
         Problema:null,
 
 
+
+
     }
     alegeProblema=(Problema)=>{
+
         this.setState({Problema:Problema})
         this.props.actualizareOptiuniDinState(this.props.index,"Problema",Problema)
 
     }
     alegeData=(Data)=>{
-       const data=new moment(Data)
-        this.props.actualizareOptiuniDinState(this.props.index,"Data_vizei",data)
-
+        this.setState({Data_viza:new moment(Data).format('MM/DD/yyyy')})
+        var data=new moment(Data).format('MM/DD/yyyy')
+        this.props.actualizareOptiuniDinState(this.props.index,"Data_viza",data)
     }
     componentDidMount() {
+        console.log(this.props.ID_fisa_lucrare_absolvire)
         axios
-            .get('Optiune/VizeList?ID_fisa_lucrare_absolvire=3')
+            .get('Optiune/VizeList?ID_fisa_lucrare_absolvire='+this.props.ID_fisa_lucrare_absolvire)
             .then(r=> {
-                for( let item of r.data ){
+
+                for (let item of r.data) {
+
                     this.props.actualizareOptiuniDinState(r.data.indexOf(item), "Problema", item.Problema)
-                    this.props.actualizareOptiuniDinState(r.data.indexOf(item),"Data_vizei",item.Data_viza)
+                    this.props.actualizareOptiuniDinState(r.data.indexOf(item), "Data_viza", item.Data_viza)
                 }
+                const ID_fisa_lucrare_absolvire = this.props.ID_fisa_lucrare_absolvire
+                this.props.actualizareOptiuniDinState(this.props.index, "ID_fisa_lucrare_absolvire", ID_fisa_lucrare_absolvire)
 
 
-            })
 
-        const ID_fisa_lucrare_absolvire=this.props.ID_fisa_lucrare_absolvire
-        this.props.actualizareOptiuniDinState(this.props.index,"ID_fisa_lucrare_absolvire",ID_fisa_lucrare_absolvire)
-
-    }
+            }) }
 
     onFileChange = event => {
         // Update the state
@@ -87,7 +91,7 @@ class Vize extends Component {
         // Send formData object
         console.log(formData)
         axios
-                .post('Optiune/PostViza?Problema='+this.state.Problema+'&Data_viza='+this.state.t4+'&ID_fisa_lucrare_absolvire='+this.props.ID_fisa_lucrare_absolvire,formData)
+                .post('Optiune/PostViza?Problema='+this.state.Problema+'&Data_viza='+this.state.Data_viza+'&ID_fisa_lucrare_absolvire='+this.props.ID_fisa_lucrare_absolvire,formData)
                 .then(re => {
 
                     console.log('Vizele au fost adaugate');
@@ -95,9 +99,11 @@ class Vize extends Component {
     }
 
 
+
     render(){
         return(
             <div >
+
            <Table>
                {/*<TableHeader>*/}
                {/*    <TableHeaderCell colSpan={3}>*/}
@@ -115,9 +121,9 @@ class Vize extends Component {
                    <TableCell >
                        <SingleDatePicker
 
-                           date={moment(this.props.vizaCopy.Data_vizei)}
+                           date={moment(this.props.vizaCopy.Data_viza)}
                            onDateChange={(e)=>this.alegeData(e)}
-                           displayFormat="DD/MM/YYYY"
+                           displayFormat="MM/DD/YYYY"
                            placeholder="Data"
                            focused={this.state.focused4}
                            onFocusChange={({focused:focused4})=>this.setState({focused4})}
@@ -126,13 +132,22 @@ class Vize extends Component {
                        />
                    </TableCell>
                    <TableCell >
+
                        <Input className={"teme-textArea"}
                               onChange={((e, data) => this.alegeProblema(data.value))}
-                              defaultValue={this.props.vizaCopy.Problema}
-                              placeholder={"Problema propusa"}/>
+
+                              value={this.props.vizaCopy.Problema}
+                             placeholder={"Problema propusa"}
+                       />
                    </TableCell>
                    <TableCell >
                        <input type="file" onChange={this.onFileChange}/>
+                       {/*{e.Semnatura_presedinte_comisie==null? <input type="file" onChange={this.onFileChange}/>: <object*/}
+                       {/*    style={{width: '30%', height: '90pt'}}*/}
+                       {/*    data={'data:application/pdf;base64,' + e.Semnatura_presedinte_comisie}></object>*/}
+
+                       {/*}*/}
+
                    </TableCell>
                    <TableCell>
                        <Button onClick={()=>{this.saveViza(this.props.ID_fisa_lucrare_absolvire)}}>Salveaza Vize</Button>
@@ -145,6 +160,7 @@ class Vize extends Component {
             </div>
 
 
-                )}
-}
+                )
+    }}
+
 export default Vize;

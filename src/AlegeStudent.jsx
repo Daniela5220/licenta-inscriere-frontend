@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 
 import Style from './Style.css';
-import {Dropdown, Input, TableBody} from "semantic-ui-react";
+import {Dropdown, Input, Menu, MenuItem, TableBody} from "semantic-ui-react";
 import {Table, Select, Button} from "semantic-ui-react";
 import axios from "./axios-API"
 import moment from "moment";
@@ -18,26 +18,63 @@ class AlegeStudent extends Component {
 
     state = {
 
-        ID_AnUniv: 39,
+        ID_AnUniv:null,
         listaCereri: [],
         idStatusNou:null,
         listaStatus: [],
         selectedOption: null,
         ID_SefDep:null,
-        Nr_op:null
+        Nr_op:null,
+        listaTermene:[],
+        AnUniv:null,
+        FacultateList:null,
+        ID_facultate:null
 
     }
 
 
     componentDidMount() {
         axios
-            .get('Optiune/GetTermene')
-            .then(rez=>{
+            .get('Optiune/AnUnivLista')
+
+            .then(r => {
+                let AnUniv = [];
+                for (let an of r.data) {
+                    AnUniv.push({
+                        key: an.ID_AnUniv,
+                        value: an.ID_AnUniv,
+                        text: an.Denumire
 
 
+                    })
+                }
+                this.setState({AnUniv: AnUniv})})
+        axios
+            .get('Optiune/FacultateList?ID_AnUniv='+this.state.ID_AnUniv)
+
+            .then(r => {
+                let FacultateList = [];
+                for (let facultate of r.data) {
+                    FacultateList.push({
+                        key: facultate.ID_Facultate,
+                        value: facultate.ID_Facultate,
+                        text: facultate.Denumire
 
 
-                 Nr_Optiune= this.seteazanroptiune(this.state.Nr_op,rez.data[0].Termen1,rez.data[0].Termen2,rez.data[0].Termen3,rez.data[0].Termen4);
+                    })
+                }
+                this.setState({FacultateList: FacultateList})})
+        axios
+            .get('Optiune/TermenInscriereListByAnUnivFacultate?ID_AnUnivCerereInscriere='+this.state.ID_AnUniv+'&ID_Facultate='+this.state.ID_facultate)
+            .then(rez=> {
+                this.setState({listaTermene: rez.data})
+                if(rez.data.length==0){
+                 var   Nr_Optiune=1
+                }else{
+                    var Nr_Optiune=this.seteazanroptiune(this.state.Nr_op)
+                }
+
+
                 console.log(Nr_Optiune)
 
             axios
@@ -70,36 +107,44 @@ class AlegeStudent extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (
             prevState.Nr_op !== this.state.Nr_op
-
         ) {
-
             this.componentDidMount()
         }
-
+        if (
+            prevState.ID_AnUniv !== this.state.ID_AnUniv
+        ) {
+            this.componentDidMount()
+        }
+        if (
+            prevState.ID_facultate !== this.state.ID_facultate
+        ) {
+            this.componentDidMount()
+        }
     }
-    seteazanroptiune = (op,d1,d2,d3,d4) => {
+    seteazanroptiune = (op) => {
         var m = moment()
-        var a = moment(d1)
-        var b = moment(d2)
-        var c = moment(d3)
-        var d = moment(d4)
+        var t3 = moment(this.state.listaTermene[2].DataStartAlegere)
+        var t2 = moment(this.state.listaTermene[1].DataStartAlegere)
+        var t1 = moment(this.state.listaTermene[1].DataStartAlegere)
 
 
         if (op != null) {
             this.setState({Nr_op: op})
             return op
         } else {
-            if (a<=m&&m<b) {
-                return 1
-            } else if (b<=m&&m<c) {
-                return 2
-            } else if (c<=m&&m<d) {
-                return 3
+            if (m > t3) {
+                return this.state.listaTermene[2].Nr_ordine
             } else {
-                console.log("In acesta perioada nu se pot actualiza statusurile optiunilor")
-                return 0
+                if (m > t2) {
+                    return this.state.listaTermene[1].Nr_ordine
+                } else {
+                    if (m > t1) {
+                        return this.state.listaTermene[1].Nr_ordine
+                    }
+                }
             }
         }
+
     }
 
 
@@ -113,6 +158,19 @@ class AlegeStudent extends Component {
 
         this.setState({
             idStatusNou: selectedOption
+        })
+        console.log(selectedOption)
+    }
+    alegeAnUniv = (selectedOption) => {
+        this.setState({
+                ID_AnUniv: selectedOption
+        })
+        console.log(selectedOption)
+
+    }
+    alegeFacultate = (selectedOption) => {
+        this.setState({
+            ID_facultate: selectedOption
         })
         console.log(selectedOption)
     }
@@ -200,6 +258,29 @@ class AlegeStudent extends Component {
             <div className={"body"}>
                 <div className={"titlu"}>Lista studentilor si temelor pentru un anumit profesor  </div>
                 <div>Lista optiunilor cu numarul</div>
+                <Menu borderless inverted color={'green'}>
+
+                    <MenuItem>
+
+                        <Dropdown
+                                style={{width:"500px"}}
+                                  searchInput={{ type: 'string' }}
+                                  placeholder='Alege anul universitar'
+                                  search selection   options={this.state.AnUniv}
+                                  onChange={((e, data) => this.alegeAnUniv(data.value))}
+                        />
+                    </MenuItem>
+                    <MenuItem>
+
+                        <Dropdown
+                            style={{width:"500px"}}
+                                  searchInput={{ type: 'string' }}
+                                  placeholder='Alege facultatea'
+                                  search selection   options={this.state.FacultateList}
+                                  onChange={((e, data) => this.alegeFacultate(data.value))}
+                        />
+                    </MenuItem>
+                </Menu>
 
                 <Input className={"teme-textArea"}
                        onChange={((e, data) => this.seteazanroptiune(data.value))}
@@ -207,6 +288,7 @@ class AlegeStudent extends Component {
 
 
                 <div>
+                    <div></div>
                     {this.state.listaCereri.map((e, index) => {
 
                         return (

@@ -57,7 +57,7 @@ class FisaPreliminariiIndrumatori extends Component {
 
 
         axios
-            .get('Optiune/GetFisaPreliminaraListByProfesorDirDepUsername?ID_AnUniv='+this.state.ID_AnUniv)
+            .get('Optiune/GetFisaLucrareListByProfesorUsernameAnUniv')
             .then(r => {
                 let fisepreliminarii = [];
                 for (let fisa of r.data) {
@@ -140,9 +140,7 @@ class FisaPreliminariiIndrumatori extends Component {
 
             <div className={"body"}>
                 <h1>Fise preliminarii</h1>
-                {
-                    this.state.showResults? <div>Test</div>  : null
-                }
+
                 <Menu
                     borderless inverted color={'grey'}>
                     <MenuItem>

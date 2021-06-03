@@ -137,7 +137,7 @@ class DepuneCerere extends Component {
                 this.setState({ID_AnUnivInscriere:r.data[0].ID_AnUniv})
 
         axios
-            .get('Optiune/GetStudentByUsernameAnUniv?ID_AnUniv=' + this.state.ID_AnUnivInscriere)
+            .get('Optiune/GetStudentByUsernameAnUniv')
             .then(re => {
                 this.setState({
                     Student: re.data
@@ -151,10 +151,31 @@ class DepuneCerere extends Component {
                     ID_student: re.data[0].ID_Student
 
                 })
+                this.setState({
+                    ID_Specializare: re.data[0].ID_Specializare
+
+                })
+
+                axios
+                    .get('Optiune/GetSesiuneActiva?ID_AnUniv='+this.state.ID_AnUnivInscriere+'&ID_specializare='+this.state.ID_Specializare)
+                    .then(r => {
+                        let Sesiune = [];
+                        for (let sesiune of r.data) {
+                            Sesiune.push({
+                                key: sesiune.DenumireSesiuneAbsolvire,
+                                value: sesiune.DenumireSesiuneAbsolvire,
+                                text: sesiune.DenumireSesiuneAbsolvire
+
+
+                            })
+                        }
+
+                        this.setState({Sesiune: Sesiune})
+                    });
 
 
                 axios
-                    .get('Optiune/GetProfesoriList?ID_AnUniv=' + this.state.ID_AnUnivInscriere + '&ID_facultate=' + this.state.ID_facultate)
+                    .get('Optiune/GetProfesoriList?ID_facultate=' + this.state.ID_facultate)
 
                     .then(r => {
                         let listaProfesori = [];
@@ -173,22 +194,7 @@ class DepuneCerere extends Component {
 
 
 
-        axios
-            .get('Optiune/SesiuneList')
 
-            .then(r => {
-                let Sesiune = [];
-                for (let sesiune of r.data) {
-                    Sesiune.push({
-                        key: sesiune,
-                        value: sesiune,
-                        text: sesiune
-
-
-                    })
-                }
-                this.setState({Sesiune: Sesiune})
-            });
 
             });
 

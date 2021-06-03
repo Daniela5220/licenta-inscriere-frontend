@@ -13,7 +13,6 @@ class RepartizareStudenti extends Component {
         ID_student:null,
         Specializari:[],
         Stud:[],
-        ID_AnUniv:39,
         ID_specializare:null,
         Profesori: []
     }
@@ -61,7 +60,7 @@ class RepartizareStudenti extends Component {
 
         this.setState({ID_student:prop})
         axios
-            .get('Optiune/GetProfesoriList?ID_AnUniv=' + this.state.ID_AnUniv + '&ID_facultate=' +facultate)
+            .get('Optiune/GetProfesoriList?ID_facultate=' +facultate)
 
             .then(r => {
                 let Profesori = [];
