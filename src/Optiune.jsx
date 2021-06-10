@@ -13,8 +13,6 @@ class Optiune extends Component {
 alegeProfesor=(profesorAles)=>{
 
         this.props.actualizareOptiuniState(this.props.index,"ID_profesor",profesorAles)
-
-
     }
 
 alegeTema=(TemaAleasa)=>{

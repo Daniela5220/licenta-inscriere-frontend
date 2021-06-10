@@ -41,7 +41,7 @@ class FisaLucrarii extends Component {
         usernameStudent: null,
         date: date,
         apreciere: null,
-        semnaturaDirDep: null,
+        semnaturaAviz: null,
         semnaturaAvizIndrumător: null,
         fileSemn: null,
         lucrare: [],
@@ -92,14 +92,16 @@ class FisaLucrarii extends Component {
 
         ],
         selectedFile: null,
-        dataprimire: moment(),
-        datapredare: moment(),
-        img: null
+      // dataprimire: moment(),
+       // datapredare: moment(),
+        disabled:false,
+        disabled2:false,
+        disabled1:false,
 
     }
     onFileChange = event => {
         // Update the state
-        this.setState({semnaturaDirDep: event.target.files[0]});
+        this.setState({semnaturaAviz: event.target.files[0]});
         //   console.log(event.target.files[0])
         this.setState({
             file: URL.createObjectURL(event.target.files[0])
@@ -115,23 +117,7 @@ class FisaLucrarii extends Component {
         })
     };
 
-    onFileChange2 = event => {
-        // Update the state
-        this.setState({semnaturaAvizIndrumător: event.target.files[0]});
-        // console.log(event.target.files[0])
-        this.setState({
-            file: URL.createObjectURL(event.target.files[0])
-        })
-    };
-    onFileChange = event => {
-        // Update the state
-        this.setState({semnaturaStudentFile: event.target.files[0]});
-        console.log(event.target.files[0])
-        this.setState({
-            file: URL.createObjectURL(event.target.files[0])
-        })
 
-    };
     // fileData = () => {
     //     if (this.state.semnaturaStudentFile) {
     //         return (
@@ -188,10 +174,14 @@ class FisaLucrarii extends Component {
     }
 
     componentDidMount() {
+            if(this.props.rol==2){
+                this.setState({disabled:true})
+            }
 
         axios
             .get('Optiune/GetFisaLucrareAbsolvireStudent?UsernameStudent=' + this.props.usernameStudent)
             .then(response => {
+                console.log(response.data)
                 this.setState({
                     viza: [
                         {
@@ -294,17 +284,28 @@ class FisaLucrarii extends Component {
                 }
                 if (response.data[0].Data_predare != null) {
                     this.setState({
-                        data_predare: response.data[0].Data_predare
+                        datapredare: response.data[0].Data_predare
+                    })
+                }else{
+                    this.setState({
+                        datapredare:moment()
                     })
                 }
-                if (response.data[0].Data_primire != null) {
+                if (response.data[0].Data_primire== null) {
+
                     this.setState({
-                        data_pimire: response.data[0].Data_primire
+                        datapimire:moment()
                     })
+                }else{
+                    this.setState({
+                        datapimire: response.data[0].Data_primire
+                    })
+
                 }
 
 
             });
+
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -345,8 +346,8 @@ class FisaLucrarii extends Component {
         console.log(this.state.semnaturaDirDep)
         formData.append(
             "myFile",
-            this.state.semnaturaDirDep,
-            this.state.semnaturaDirDep.name
+            this.state.semnaturaAviz,
+            this.state.semnaturaAviz.name
         );
         //avizul directorului de departament
         axios
@@ -382,12 +383,32 @@ class FisaLucrarii extends Component {
             .then(r => {
 
             })
-        //post semnaturi student, profesor, dir deep
+        // post semnaturi student, profesor, dir deep
         axios
             .post('Optiune/PostFisaLucrareSemnaturi?ID_fisa_lucrare_absolvire=' + idfisa, formData)
             .then(r => {
 
             })
+    }
+    update = (idfisa) => {
+        const request = {
+            ID_fisa_lucrare_absolvire: idfisa,
+            tema_lucrare: this.state.tema,
+            probleme_principale: this.state.problemePrincipale,
+            loc_durata_practica: this.state.locdurata,
+            bibliografie: this.state.bibliografie,
+            data_primire: this.state.dataprimire.format('DD/MM/yyyy'),
+            data_predare: this.state.datapredare.format('DD/MM/yyyy'),
+            Aspecte_particulare: this.state.aspecteParticulare
+        };
+        const post = JSON.stringify(request);
+        //post modificari fisa lucrare absolvire student +profesor coordonator
+        axios
+            .post('Optiune/PostFisaLucrareUpdate', post)
+            .then(r => {
+
+            })
+
     }
 
 
@@ -395,8 +416,8 @@ class FisaLucrarii extends Component {
         const formData = new FormData();
         formData.append(
             "myFile",
-            this.state.semnaturaAvizIndrumător,
-            this.state.semnaturaAvizIndrumător.name
+            this.state.semnaturaAviz,
+            this.state.semnaturaAviz.name
         );
 
         axios
@@ -441,7 +462,7 @@ class FisaLucrarii extends Component {
                         <div className={'body'} key={e.ID_fisa_lucrare_absolvire}>
 
 
-                            <h1>FIŞA LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENŢĂ/ PROIECTULUI DE DIPLOMĂ/ DISERTAŢIE</h1>
+                            <h1>FIŞA LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENŢĂ/ PROIECTULUI DE DIPLOMĂ/ DISERTAŢTIE</h1>
                             <Table>
                                 <TableRow>
                                     <TableCell>Universitatea Transilvania din Braşov</TableCell>
@@ -454,7 +475,7 @@ class FisaLucrarii extends Component {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>Departamentul: {e.Departament} </TableCell>
-                                    <TableCell>Viza facultăţii   <Checkbox /></TableCell>
+                                    <TableCell>Viza facultăţii <Checkbox/></TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>Programul de studii: {e.DenumireSpecializare}</TableCell>
@@ -479,7 +500,7 @@ class FisaLucrarii extends Component {
                                 <TableRow>
                                     <TableCell>
                                         <div>Tema lucrarii</div>
-                                        <TextArea className={'TextArea'} defaultValue={e.Tema_lucrare}
+                                        <TextArea className={'TextArea'} value={e.Tema_lucrare}
                                                   onChange={((e, data) => this.temalucrare(data.value))}
                                         ></TextArea>
                                     </TableCell>
@@ -488,7 +509,7 @@ class FisaLucrarii extends Component {
                                     <TableCell>
                                         <div>Probleme principale</div>
 
-                                        <TextArea className={'TextArea'} defaultValue={e.Probleme_principale}
+                                        <TextArea className={'TextArea'} value={e.Probleme_principale}
                                                   onChange={((e, data) => this.changeProblemePrincipale(data.value))}
                                         ></TextArea>
                                     </TableCell>
@@ -497,21 +518,21 @@ class FisaLucrarii extends Component {
                                     <TableCell>
                                         <div>Locul si durata</div>
                                         <TextArea className={'TextArea'}
-                                                  defaultValue={e.Loc_durata_practica}></TextArea>
+                                                  value={e.Loc_durata_practica}></TextArea>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>
                                         <div>Bibliografie</div>
 
-                                        <TextArea className={'TextArea'} defaultValue={e.Bibliografie}></TextArea>
+                                        <TextArea className={'TextArea'} value={e.Bibliografie}></TextArea>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>
                                         <div>Aspecte particulare</div>
 
-                                        <TextArea className={'TextArea'} defaultValue={e.Aspecte_particulare}
+                                        <TextArea className={'TextArea'} value={e.Aspecte_particulare}
                                                   onChange={((e, data) => this.aspecteparticulare(data.value))}
                                         ></TextArea>
 
@@ -531,6 +552,7 @@ class FisaLucrarii extends Component {
                                     /></TableCell>
                                 </TableRow>
                                 <TableRow>
+
                                     <TableCell>Data primirii lucrării: <SingleDatePicker
 
                                         date={moment(this.state.dataprimire)}
@@ -544,21 +566,26 @@ class FisaLucrarii extends Component {
                                     /></TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell>
+                                    <TableCell disabled = {(this.state.disabled)? "disabled" : ""}
+                                    >
                                         <div> Director departament: {e.NumeDirectorDepartamnet}</div>
-                                        {e.Director_departament_semnatura==null? <input type="file" onChange={this.FileChange}/>: <object
-                                            style={{width: '100pt', height: '75pt'}}
-                                            data={'data:application/pdf;base64,' + e.Director_departament_semnatura}></object>
+                                        {e.Director_departament_semnatura == null ?
+                                            <input type="file" onChange={this.FileChange}/> : <object
+                                                style={{width: '100pt', height: '75pt'}}
+                                                data={'data:application/pdf;base64,' + e.Director_departament_semnatura}></object>
                                         }
                                     </TableCell>
 
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell>
+                                    <TableCell disabled = {(this.state.disabled)? "disabled" : ""}
+
+                                    >
                                         <div>Cadru didactic îndrumător: {e.NumeCoordonamtor}</div>
-                                        {e.Indrumator_semnatura==null? <input type="file" onChange={this.FileChange}/>: <object
-                                            style={{width: '100pt', height: '75pt'}}
-                                            data={'data:application/pdf;base64,' + e.Indrumator_semnatura}></object>
+                                        {e.Indrumator_semnatura == null ?
+                                            <input type="file" onChange={this.FileChange}/> : <object
+                                                style={{width: '100pt', height: '75pt'}}
+                                                data={'data:application/pdf;base64,' + e.Indrumator_semnatura}></object>
                                         }
 
                                     </TableCell>
@@ -566,9 +593,10 @@ class FisaLucrarii extends Component {
                                 <TableRow>
                                     <TableCell>
                                         <div>Candidat: {e.NumeStudent} {e.PrenumeStudent} </div>
-                                        {e.Semnatura_student==null? <input type="file" onChange={this.FileChange}/>: <object
-                                            style={{width: '100pt', height: '75pt'}}
-                                            data={'data:application/pdf;base64,' + e.Semnatura_student}></object>
+                                        {e.Semnatura_student == null ? <input type="file" onChange={this.FileChange}/> :
+                                            <object
+                                                style={{width: '100pt', height: '75pt'}}
+                                                data={'data:application/pdf;base64,' + e.Semnatura_student}></object>
                                         }
 
 
@@ -578,6 +606,9 @@ class FisaLucrarii extends Component {
                             <Button onClick={() => {
                                 this.saveChange(e.ID_fisa_lucrare_absolvire)
                             }}>Salveaza</Button>
+                            <Button onClick={() => {
+                                this.update(e.ID_fisa_lucrare_absolvire)
+                            }}>Salveaza modificarile</Button>
                             <Table>
                                 <TableHeader>
                                     <TableHeaderCell colSpan={3}>
@@ -606,13 +637,16 @@ class FisaLucrarii extends Component {
 
                                 {this.state.viza.map((item, index) => {
                                     return (
-                                        <Vize colSpan={3}
+                                        <Vize
+
+                                            colSpan={3}
                                               actualizareOptiuniDinState={this.actualizareOptiuniDinState.bind(this)}
                                               ID_fisa_lucrare_absolvire={e.ID_fisa_lucrare_absolvire}
                                               vizaCopy={item}
                                               index={index}
                                               key={index}
                                               viza={this.state.viza}
+                                            disabled={this.state.disabled}
 
 
                                         />
@@ -633,7 +667,7 @@ class FisaLucrarii extends Component {
                                 </TableHeader>
                                 <tbody>
                                 <TableRow>
-                                    <TableCell colSpan={3}>
+                                    <TableCell colSpan={3} disabled = {(this.state.disabled)? "disabled" : ""}>
                                         <TextArea
                                             className={'TextArea'} defaultValue={e.Indrumator_apreciere}
                                             onChange={((e, data) => this.apreciereindrumator(data.value))}
@@ -649,9 +683,9 @@ class FisaLucrarii extends Component {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>
-                                        <div>  {this.dataAvizIndrumator(e.Indrumator_data_aviz)}</div>
+                                          {this.dataAvizIndrumator(e.Indrumator_data_aviz)}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell disabled = {(this.state.disabled)? "disabled" : ""}>
 
                                         <Form>
 
@@ -675,18 +709,22 @@ class FisaLucrarii extends Component {
                                             </Form.Field>
                                         </Form>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell disabled = {(this.state.disabled)? "disabled" : ""}>
 
-                                        {e.Indrumator_semnat_avize==null? <input type="file" onChange={this.onFileChange}/>: <object
-                                            style={{width: '30%', height: '90pt'}}
-                                            data={'data:application/pdf;base64,' + e.Indrumator_semnat_avize}></object>
+                                        {e.Indrumator_semnat_avize == null ?
+                                            <input type="file" onChange={this.onFileChange}/> : <object
+                                                style={{width: '30%', height: '90pt'}}
+                                                data={'data:application/pdf;base64,' + e.Indrumator_semnat_avize}></object>
 
                                         }
                                     </TableCell>
                                 </TableRow>
                                 </tbody>
                             </Table>
-                            <Button onClick={() => {
+                            <Button
+                                disabled = {(this.state.disabled)? "disabled" : ""}
+
+                                onClick={() => {
                                 this.saveIndrumatorAviz(e.ID_fisa_lucrare_absolvire)
                             }}>Salveaza</Button>
 
@@ -708,10 +746,10 @@ class FisaLucrarii extends Component {
                                     <TableCell>
                                         {this.dataAvizDirDep(e.Director_departament_data_aviz)}
                                     </TableCell>
-                                    <TableCell>
-                                        <Form>
+                                    <TableCell  disabled = {(this.state.disabled)? "disabled" : ""}>
+                                        <Form >
 
-                                            <Form.Field>
+                                            <Form.Field >
                                                 <Radio
                                                     label='ADMIS'
                                                     name='radioGroup2'
@@ -732,10 +770,11 @@ class FisaLucrarii extends Component {
                                         </Form>
 
                                     </TableCell>
-                                    <TableCell>
-                                        {e.Director_departament_semnatura_aviz==null? <input type="file" onChange={this.onFileChange}/>: <object
-                                            style={{width: '30%', height: '90pt'}}
-                                            data={'data:application/pdf;base64,' + e.Director_departament_semnatura_aviz}></object>
+                                    <TableCell disabled = {(this.props.disabled)? "disabled" : ""}>
+                                        {e.Director_departament_semnatura_aviz == null ?
+                                            <input type="file" onChange={this.onFileChange}/> : <object
+                                                style={{width: '30%', height: '90pt'}}
+                                                data={'data:application/pdf;base64,' + e.Director_departament_semnatura_aviz}></object>
 
                                         }
 
@@ -745,13 +784,16 @@ class FisaLucrarii extends Component {
 
                                 </tbody>
                             </Table>
-                            <Button onClick={() => {
+                            <Button
+                                disabled = {(this.state.disabled)? "disabled" : ""}
+                                onClick={() => {
                                 this.save(e.ID_fisa_lucrare_absolvire)
                             }}>Salveaza</Button>
                             <RezultatSustinereLicenta
                                 ID_AnUniv={this.props.ID_AnUniv}
                                 ID_Student={e.ID_student}
                                 ID_fisa_lucrare_absolvire={e.ID_fisa_lucrare_absolvire}
+                                disabled={this.state.disabled}
                             />
 
                         </div>

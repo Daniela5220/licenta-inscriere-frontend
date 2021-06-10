@@ -79,21 +79,13 @@ class DepuneCerere extends Component {
             this.setState({ID_AnUnivInscriere:An})
         }
     savefunction = () => {
-        // Create an object of formData
-        const formData = new FormData();
-
-        // Update the formData object
+            const formData = new FormData();
         formData.append(
             "myFile",
             this.state.semnaturaStudentFile,
             this.state.semnaturaStudentFile.name
         );
-
-        // Details of the uploaded file
         console.log(this.state.semnaturaStudentFile);
-
-        // Request made to the backend api
-        // Send formData object
         console.log(formData)
 
         //Adaugam in baza de date o cerere

@@ -57,7 +57,7 @@ class FisaPreliminariiIndrumatori extends Component {
 
 
         axios
-            .get('Optiune/GetFisaLucrareListByProfesorUsernameAnUniv')
+            .get('Optiune/GetFisaPreliminaraListByProfesorDirDepUsername')
             .then(r => {
                 let fisepreliminarii = [];
                 for (let fisa of r.data) {

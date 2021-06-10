@@ -119,12 +119,12 @@ class App extends Component {
   render() {
     return (
         <div>
-            <DepuneCerere/>
+            {/*<DepuneCerere/>*/}
             {/*<AlegeStudent/>*/}
             {/*<RepartizareStudenti/>*/}
             {/*{this.fisapreliminaraacces()}*/}
-            {/*<FiseLucrariList/>*/}
-            {/*{this.fisalucrareafisare()}*/}
+            {/*/!*<FiseLucrariList/>*!/*/}
+            {this.fisalucrareafisare()}
 
 
 

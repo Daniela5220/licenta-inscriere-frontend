@@ -36,7 +36,7 @@ class RezultatSustinereLicenta extends Component {
         SefComisie:null,
         semnaturaPresedinteComisie:null,
         sesiune:null,
-        rezultatelicenta:[]
+        rezultatelicenta:null
     }
     handleChange=(e, { value }) =>{
         this.setState({ rezultat:value })
@@ -84,6 +84,7 @@ class RezultatSustinereLicenta extends Component {
                 console.log(rez.data);
                 if(rez.data.length!=0) {
                     console.log(rez.data)
+                    this.setState({semnaturaPresedinteComisie:rez.data[0].Semnatura_presedinte_comisie})
                     this.setState({media:rez.data[0].Media})
                     this.setState({SefComisie:{key:rez.data[0].ID_presedinte_comisie,value:rez.data[0].ID_presedinte_comisie, text:rez.data[0].NumePresedinteComisie+' '+rez.data[0].PrenumePresedinteComisie}});
                         console.log(rez.data[0].ID_presedinte_comisie)
@@ -144,8 +145,6 @@ class RezultatSustinereLicenta extends Component {
 
         return(
             <div >
-                {this.state.rezultatelicenta.map((e, index) => {
-                    return(
 
                 <Table>
                     <TableHeader>
@@ -165,7 +164,7 @@ class RezultatSustinereLicenta extends Component {
                             Rezultatul
                             susţinerii
                         </TableCell>
-                        <TableCell>
+                        <TableCell disabled = {(this.props.disabled)? "disabled" : ""}>
                             <Form>
 
                                 <Form.Field>
@@ -198,24 +197,23 @@ class RezultatSustinereLicenta extends Component {
                                 </Form.Field>
                             </Form>
                         </TableCell>
-                        <TableCell>
-                            <div>
-                            <div>Media:</div>
-                                <TextArea
-                                    disabled = {(this.state.disabled)? "disabled" : ""}
-                                    className={'TextArea'} defaultValue= {this.state.media}
+                        <TableCell >
+
+                            Media:
+                                <TextArea disabled = {(this.props.disabled)? "disabled" : ""}
+
+                                    className={'TextArea'}
                                     value={this.state.media}
                                           onChange={((e, data) => this.changeMedia(data.value))}
                                 ></TextArea>
 
-                            </div>
                         </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell>
                             Presedinte comisie:
                         </TableCell>
-                        <TableCell>
+                        <TableCell disabled = {(this.props.disabled)? "disabled" : ""}>
 
                             <Dropdown
 
@@ -228,19 +226,23 @@ class RezultatSustinereLicenta extends Component {
                             />
                         </TableCell>
                         <TableCell>
-                            {e.Semnatura_presedinte_comisie==null? <input type="file" onChange={this.onFileChange}/>: <object
+
+                            {this.state.semnaturaPresedinteComisie==null? <input type="file" onChange={this.onFileChange}/>: <object
                                 style={{width: '100pt', height: '75pt'}}
-                                data={'data:application/pdf;base64,' + e.Semnatura_presedinte_comisie}></object>
+                                data={'data:application/pdf;base64,' + this.state.semnaturaPresedinteComisie}></object>
                             }
                         </TableCell>
                     </TableRow>
-                    </tbody>
-                    <Button className={"savebutton"}  onClick={() => {
 
-                        this.save()
-                    }}>Save</Button>
+                    </tbody>
                 </Table>
-                        )})}
+                <Button
+                    disabled = {(this.props.disabled)? "disabled" : ""}
+                    className={"savebutton"}  onClick={() => {
+
+                    this.save()
+                }}>Salvare</Button>
+
             </div>
 
 

@@ -55,6 +55,7 @@ class Vize extends Component {
 
                     this.props.actualizareOptiuniDinState(r.data.indexOf(item), "Problema", item.Problema)
                     this.props.actualizareOptiuniDinState(r.data.indexOf(item), "Data_viza", item.Data_viza)
+                    this.props.actualizareOptiuniDinState(r.data.indexOf(item), "Indrumator_semnat", item.Indrumator_semnat)
                 }
                 const ID_fisa_lucrare_absolvire = this.props.ID_fisa_lucrare_absolvire
                 this.props.actualizareOptiuniDinState(this.props.index, "ID_fisa_lucrare_absolvire", ID_fisa_lucrare_absolvire)
@@ -118,7 +119,7 @@ class Vize extends Component {
                {/*    <TableCell>Semnatura cadrului didactic indrumator</TableCell>*/}
                {/*</TableRow>*/}
                <TableRow>
-                   <TableCell >
+                   <TableCell disabled = {(this.props.disabled)? "disabled" : ""} >
                        <SingleDatePicker
 
                            date={moment(this.props.vizaCopy.Data_viza)}
@@ -131,7 +132,7 @@ class Vize extends Component {
                            isOutsideRange={() => false}
                        />
                    </TableCell>
-                   <TableCell >
+                   <TableCell  disabled = {(this.props.disabled)? "disabled" : ""} >
 
                        <Input className={"teme-textArea"}
                               onChange={((e, data) => this.alegeProblema(data.value))}
@@ -140,16 +141,15 @@ class Vize extends Component {
                              placeholder={"Problema propusa"}
                        />
                    </TableCell>
-                   <TableCell >
-                       <input type="file" onChange={this.onFileChange}/>
-                       {/*{e.Semnatura_presedinte_comisie==null? <input type="file" onChange={this.onFileChange}/>: <object*/}
-                       {/*    style={{width: '30%', height: '90pt'}}*/}
-                       {/*    data={'data:application/pdf;base64,' + e.Semnatura_presedinte_comisie}></object>*/}
+                   <TableCell  disabled = {(this.props.disabled)? "disabled" : ""}>
+                       {this.props.vizaCopy.Indrumator_semnat==null? <input type="file" onChange={this.onFileChange}/>: <object
+                           style={{width: '80pt', height: '60pt'}}
+                           data={'data:application/pdf;base64,' + this.props.vizaCopy.Indrumator_semnat}></object>
 
-                       {/*}*/}
+                       }
 
                    </TableCell>
-                   <TableCell>
+                   <TableCell disabled = {(this.props.disabled)? "disabled" : ""}>
                        <Button onClick={()=>{this.saveViza(this.props.ID_fisa_lucrare_absolvire)}}>Salveaza Vize</Button>
 
                    </TableCell>

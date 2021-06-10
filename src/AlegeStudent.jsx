@@ -141,11 +141,7 @@ class AlegeStudent extends Component {
                     if (m > t1) {
                         return this.state.listaTermene[1].Nr_ordine
                     }
-                }
-            }
-        }
-
-    }
+                }}}}
 
 
 
@@ -257,7 +253,6 @@ class AlegeStudent extends Component {
         return (
             <div className={"body"}>
                 <div className={"titlu"}>Lista studentilor si temelor pentru un anumit profesor  </div>
-                <div>Lista optiunilor cu numarul</div>
                 <Menu borderless inverted color={'green'}>
 
                     <MenuItem>
@@ -267,6 +262,7 @@ class AlegeStudent extends Component {
                                   searchInput={{ type: 'string' }}
                                   placeholder='Alege anul universitar'
                                   search selection   options={this.state.AnUniv}
+                               // value={this.state.AnUniv[0]}
                                   onChange={((e, data) => this.alegeAnUniv(data.value))}
                         />
                     </MenuItem>

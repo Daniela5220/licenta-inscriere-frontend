@@ -165,7 +165,7 @@ changeProblemePrincipale=(p)=>{
         this.setState({aspecteParticulare:p})
 
     }
-    update=(fisa, Probleme_principale)=>{
+    save=(fisa, Probleme_principale)=>{
 
         const formData = new FormData();
         formData.append(
@@ -450,7 +450,7 @@ componentDidUpdate(prevProps, prevState) {
                     </Table>
                 {/*<div>Data: {this.state.date}</div>*/}
 
-                                <Button className={"savebutton"} color='green' onClick={() => {this.update(e.ID_fisa_preliminara,e.Probleme_principale)}}>Save</Button>
+                                <Button className={"savebutton"} color='green' onClick={() => {this.save(e.ID_fisa_preliminara,e.Probleme_principale)}}>Save</Button>
 
 
 
