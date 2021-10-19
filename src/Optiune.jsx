@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Button, Dropdown,Input} from "semantic-ui-react";
+import {Button, Checkbox, Dropdown, Grid, GridColumn, GridRow, Icon, Input} from "semantic-ui-react";
 import Style from'./Style.css';
 import axios from "./axios-API"
 const optiune = {
@@ -10,44 +10,76 @@ class Optiune extends Component {
         super(props)
 
     }
-alegeProfesor=(profesorAles)=>{
+    iconStatus=(param)=>{
+        console.log(param)
+        if(param=='ADMIS'){
+            return (
+                <div>
+                <Icon color='green' name='check circle outline' />
+                <label>{param}</label>
+                 </div>
+            )
+        }else
+            if(param==null){
+            }
+            else{
+            return(
+                <div>
+                <Icon color='red' name='window close outline' />
+                <label>{this.props.optiuneCopy.Status}</label>
+                </div>
+            )}}
 
-        this.props.actualizareOptiuniState(this.props.index,"ID_profesor",profesorAles)
+
+    alegeProfesor = (profesorAles) => {
+
+        this.props.actualizareOptiuniState(this.props.index, "ID_profesor", profesorAles)
     }
 
-alegeTema=(TemaAleasa)=>{
-    this.props.actualizareOptiuniState(this.props.index,"Tema_lucrare",TemaAleasa)
+    alegeTema = (TemaAleasa) => {
+        this.props.actualizareOptiuniState(this.props.index, "Tema_lucrare", TemaAleasa)
 
     }
 
 
-
-    render(){
-        return(
+    render() {
+        return (
             <div>
 
-                <div>Tema </div>
+                <div>Tema</div>
+                <Grid columns={2}  >
+                    <Grid.Row >
+                        <Grid.Column width={14} >
                 <Input className={"teme-textArea"}
-                       onChange={((e, data) => this.alegeTema(data.value))}
-                       defaultValue={this.props.optiuneCopy.Tema_lucrare}
-                       placeholder={"Intodu tema lucrarii"}/>
 
+                       defaultValue={this.props.optiuneCopy.Tema_lucrare}
+                       placeholder={"Intodu tema lucrarii"}
+                       onChange={((e, data) => this.alegeTema(data.value))}
+
+                />
+                    </Grid.Column>
+                        <Grid.Column  width={2} >
+                            {/* eslint-disable-next-line react/jsx-no-undef */}
+                            {this.iconStatus(this.props.optiuneCopy.Status)}
+                        </Grid.Column>
+
+                    </Grid.Row>
+                </Grid>
                 <div>Cadrul didactic indrumator</div>
                 <Dropdown
 
-                    searchInput={{ type: 'string' }}
+                    className={"dropdown-profesorilist"}
+                    searchInput={{type: 'string'}}
+                    value={this.props.optiuneCopy.ID_profesor}
                     placeholder='Alege profesor coordonator'
-                    search selection   options={this.props.listaProfesori}
-                    defaultValue={this.props.optiuneCopy.ID_profesor}
+                    search selection options={this.props.listaProfesori}
+
                     onChange={((e, data) => this.alegeProfesor(data.value))}
                 />
 
 
-
-
-
             </div>
-        )
+            )
     }
 
 }

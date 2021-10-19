@@ -30,7 +30,8 @@ class FiseLucrariList extends Component {
         usernameStudent:null,
         an:null,
         showResults:true,
-        fiselucrari:[]
+        fiselucrari:[],
+        fisalucrariiselectate:null
 
 
 
@@ -52,14 +53,12 @@ class FiseLucrariList extends Component {
             return(
 
                 <div>
-                    {console.log("Retureneaza ceva")}
+
                     <FisaLucrarii
                         usernameStudent={this.state.usernameStudent}
                         ID_AnUniv={this.state.ID_AnUniv}
+                        rol={this.props.rol}
                     />
-                    {console.log("Unde e problema")}
-
-
                 </div>
 
             )
@@ -140,10 +139,8 @@ class FiseLucrariList extends Component {
                 this.setState({
                     usernameStudent: rez.data
                 })
-
+                this.setState({fisalucrariiselectate:IDStudent})
             })
-
-
     }
 
 
@@ -164,6 +161,7 @@ class FiseLucrariList extends Component {
                             searchInput={{ type: 'string' }}
                             placeholder='Alege fisa lucrării'
                             search selection   options={this.state.fiselucrari}
+                            value={this.state.fisalucrariiselectate}
                             onChange={((e, data) => this.seteazaUsername(data.value))}
 
                         />

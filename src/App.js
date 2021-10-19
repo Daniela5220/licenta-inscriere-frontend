@@ -26,7 +26,7 @@ import {Component} from "react";
 import DepuneCerere from "./DepuneCerere";
 import Optiune from "./Optiune";
 import RepartizareStudenti from "./RepartizareStudenti";
-import {Dimmer} from "semantic-ui-react";
+import {Dimmer, Loader} from "semantic-ui-react";
 import FisaPreliminara from "./FisaPreliminara";
 import FisaPreliminariiIndrumatori from "./FisaPreliminariiIndrumatori";
 import Vize from "./Vize";
@@ -34,11 +34,13 @@ import FisaLucrarii from "./FisaLucrarii";
 import Semnatura from "./Semnatura";
 import axios from "./axios-API";
 import FiseLucrariList from "./FiseLucrariList";
+import RezultatSustinereLicenta from "./RezultatSustinereLicenta";
 
 class App extends Component {
     state={
         username:null,
         ID_AnUniv:null,
+        log:0
 
 
     }
@@ -60,6 +62,7 @@ class App extends Component {
             .then(re => {
                 this.setState({rol: re.data});
                 console.log(this.state.rol)
+                this.setState({log:1})
             })
 
 
@@ -117,14 +120,19 @@ class App extends Component {
 
 
   render() {
+      {this.state.log===0&&
+      <div>
+          <Loader active inline='centered'>Loading</Loader>
+      </div>
+      }
     return (
         <div>
             {/*<DepuneCerere/>*/}
-            {/*<AlegeStudent/>*/}
+            <AlegeStudent/>
             {/*<RepartizareStudenti/>*/}
             {/*{this.fisapreliminaraacces()}*/}
-            {/*/!*<FiseLucrariList/>*!/*/}
-            {this.fisalucrareafisare()}
+            {/*{this.fisalucrareafisare()}*/}
+            {/*<RezultatSustinereLicenta/>*/}
 
 
 

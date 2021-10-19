@@ -12,7 +12,7 @@ import {
     TableHeader,
     TableRow,
     TableCell,
-    TableBody, GridRow, GridColumn, TableHeaderCell
+    TableBody, GridRow, GridColumn, TableHeaderCell, Loader, Dimmer, Image, Segment, Modal, Checkbox
 
 } from "semantic-ui-react";
 import Style from'./Style.css';
@@ -56,7 +56,12 @@ class FisaPreliminara extends Component {
         disabled:false,
         disabled2:false,
         disabled1:false,
-        selectedFile:null
+        selectedFile:null,
+        log:0,
+        modalSucces:false,
+        modalEroare:false,
+        confirmare:null
+
 
     }
 
@@ -92,8 +97,9 @@ class FisaPreliminara extends Component {
             .then(rez => {
                 this.setState({
                     Fisa: rez.data
-
                 })
+                this.setState({log:1})
+                console.log(rez.data)
                 this.setState({problemePrincipale:rez.data[0].Probleme_principale})
                 this.setState({locdurata:rez.data[0].Loc_durata})
                 this.setState({bibliografie:rez.data[0].Bibliografie})
@@ -119,6 +125,11 @@ class FisaPreliminara extends Component {
                 }else{
                     this.setState({t4:rez.data[0].Termen4})
                 }
+                if(rez.data[0].Termen_predare==null){
+                    this.setState({t5:moment()})
+                }else{
+                    this.setState({t5:rez.data[0].Termen_predare})
+                }
 
 
             });
@@ -135,18 +146,18 @@ class FisaPreliminara extends Component {
         })
 
     };
-    // fileData = () => {
-    //     if (this.state.selectedFile) {
-    //         return (
-    //             <div>
-    //                 <p>{/*Last Modified:{" "}*/}
-    //                     {/*{this.state.selectedFile.lastModifiedDate.toDateString()}*/}
-    //                     <object data={this.state.file} type="application/pdf" width="25%" height="25%"/>
-    //                 </p>
-    //             </div>
-    //         );
-    //     }
-    // };
+    fileData = () => {
+        if (this.state.selectedFile) {
+            return (
+                <div>
+                    <p>{/*Last Modified:{" "}*/}
+                        {/*{this.state.selectedFile.lastModifiedDate.toDateString()}*/}
+                        <object data={this.state.file} type="application/pdf" width="30%" height="25%"/>
+                    </p>
+                </div>
+            );
+        }
+    };
 
 changeProblemePrincipale=(p)=>{
     this.setState({problemePrincipale:p})
@@ -165,6 +176,29 @@ changeProblemePrincipale=(p)=>{
         this.setState({aspecteParticulare:p})
 
     }
+    salveazaSemnaturiDirDep=()=>{
+
+
+
+        const formData = new FormData();
+        formData.append(
+            "myFile",
+            this.state.selectedFile,
+            this.state.selectedFile.name
+        );
+        this.setState({confirmare:"A aparut o problema, semnatura NU a fost adăugată!"});
+        axios
+            .post('Optiune/PutFisaPreliminaraSemnaturaDirDepAddByIDDirDep',formData)
+            .then(re=> {
+                console.log(re)
+                console.log("Semnatrile au fost inserate cu succes au fost efectuate")
+                this.setState({confirmare:"Semnatrile au fost inserate cu succes au fost efectuat"})
+            })
+
+
+
+
+}
     save=(fisa, Probleme_principale)=>{
 
         const formData = new FormData();
@@ -174,41 +208,57 @@ changeProblemePrincipale=(p)=>{
             this.state.selectedFile.name
         );
 
-    if(this.props.rol==0){
 
-        axios
-            .post('Optiune/PutFisaPreliminara?ID_fisa_preliminara='+fisa+'&probleme_principale='+this.state.problemePrincipale+'&loc_durata='+this.state.locdurata+'&bibliografie='+this.state.bibliografie+'&Termen1='+this.state.t1.format('DD/MM/yyyy')+'&Termen2='+this.state.t2.format('DD/MM/yyyy')+'&Termen3='+this.state.t3.format('DD/MM/yyyy')+'&Termen4='+this.state.t4.format('DD/MM/yyyy'),this.state.t5,formData)
-            .then(re=> {
-                console.log(re)
-                console.log("Updatarile au fost efectuate")
-            })
+    if(this.props.rol==0){
+            try{
+                axios
+                    .post('Optiune/PutFisaPreliminara?ID_fisa_preliminara='+fisa+'&probleme_principale='+this.state.problemePrincipale+'&loc_durata='+this.state.locdurata+'&bibliografie='+this.state.bibliografie+'&Termen1='+this.state.t1.format('DD/MM/yyyy')+'&Termen2='+this.state.t2.format('DD/MM/yyyy')+'&Termen3='+this.state.t3.format('DD/MM/yyyy')+'&Termen4='+this.state.t4.format('DD/MM/yyyy')+'&Termen_predare='+this.state.t5.format('DD/MM/yyyy'),formData)
+                    .then(re=> {
+                        console.log(re)
+                        console.log("Updatarile au fost efectuate")
+                    })
+            }catch (Exception ){
+            console.log("Nu ai completat toate câmpurile")
+            this.setState({modalEroare:true});
+        }
+
     }
     if(this.props.rol==2){
+        try {
 
-        if(this.state.aspecteParticulare!=null) {
-            console.log(this.state.aspecteParticulare)
+
+            if (this.state.aspecteParticulare != null) {
+                console.log(this.state.aspecteParticulare)
+                axios
+                    .put('Optiune/PutFisaPreliminaraStudent?ID_fisa_preliminara=' + fisa + '&Aspecte_particulare=' + this.state.aspecteParticulare)
+                    .then(re => {
+                        console.log("Updatarile au fost efectuate")
+                    })
+
+            }
             axios
-                .put('Optiune/PutFisaPreliminaraStudent?ID_fisa_preliminara=' + fisa + '&Aspecte_particulare=' + this.state.aspecteParticulare)
+                .post('Optiune/PutSemnaturaStudent?ID_fisa_preliminara=' + fisa, formData)
                 .then(re => {
-                    console.log("Updatarile au fost efectuate")
+                    console.log(re)
+
                 })
+        }catch (Exception ){
+            console.log("Nu ai completat toate câmpurile")
+            this.setState({modalEroare:true});
 
-        }
-        axios
-            .post('Optiune/PutSemnaturaStudent?ID_fisa_preliminara='+fisa,formData)
-            .then(re => {
-                console.log(re)
-
-            })
-
-    }
+    }}
     if(this.props.rol==1){
+        try{
         axios
             .post('Optiune/PutFisaPreliminaraSemnaturaDirDepAdd?ID_fisa_preliminara='+fisa,formData)
             .then(re => {
                 console.log(re)
-            })}
-}
+            })
+
+         }catch (Exception ){
+            console.log("Nu ai completat toate câmpurile")
+            this.setState({modalEroare:true});
+}}}
 componentDidUpdate(prevProps, prevState) {
         if (
             prevProps.username !== this.props.username &&
@@ -220,16 +270,27 @@ componentDidUpdate(prevProps, prevState) {
 
     }
     render(){
+        {this.state.log===0&&
+        <div>
+            <Loader active inline='centered'>Loading</Loader>
+        </div>
+        }
         return(
-            <div className={'body'}>
-
+            <div className={'body'} >
+                <Checkbox label={<label>Semnează toate fișele</label>}  onClick={()=>this.setState({openModal:true})}  />
 
                     {this.state.Fisa.map((e, index) => {
                         return (
                             <div key={e.ID_fisa_preliminara}>
 
                                 <Table >
-                                <TableHeader>UNIVERSITATEA TRANSILVANIA DIN BRASOV</TableHeader>
+
+                                <TableHeader >
+                                    <TableHeaderCell colSpan={2}>UNIVERSITATEA TRANSILVANIA DIN BRASOV</TableHeaderCell>
+                                    </TableHeader>
+
+
+
                                 <tbody>
 
                     <TableRow>
@@ -259,28 +320,26 @@ componentDidUpdate(prevProps, prevState) {
                     <tbody>
                     <TableRow>
                         <TableCell className={'fptrow'}>Tema lucrarii</TableCell>
-                        <TableCell colSpan={3}
-                                   disabled = {(this.state.disabled)? "disabled" : ""}
-                        >
-                            <TextArea className={'TextArea'} defaultValue={e.Tema_lucrare}></TextArea>
+                        <TableCell colSpan={3}>
+                            <TextArea className={'TextArea'} defaultValue={e.Tema_lucrare}
+                                      disabled = {this.state.disabled}
+                            ></TextArea>
                         </TableCell>
                         </TableRow>
                            <TableRow>
                         <TableCell> Problemele principale care vor fi tratate:</TableCell>
-                               <TableCell colSpan={3}
-                                          disabled = {(this.state.disabled)? "disabled" : ""}
-                               >
+                               <TableCell colSpan={3}>
                                    <TextArea className={'TextArea'} defaultValue={e.Probleme_principale}
+                                             disabled = {this.state.disabled}
                                              onChange={((e, data) => this.changeProblemePrincipale(data.value))}
                                    ></TextArea>
                                </TableCell>
                            </TableRow>
                     <TableRow>
                         <TableCell>Locul si durata practicii:</TableCell>
-                        <TableCell colSpan={3}
-                                   disabled = {(this.state.disabled)? "disabled" : ""}
-                        >
+                        <TableCell colSpan={3}>
                             <TextArea className={'TextArea'}
+                                      disabled = {this.state.disabled}
                                       defaultValue={e.Loc_durata}
                                       onChange={((e, data) => this.locdurata(data.value))}
                             ></TextArea>
@@ -288,11 +347,9 @@ componentDidUpdate(prevProps, prevState) {
                     </TableRow>
                     <TableRow>
                         <TableCell>Bibliografia recomandata:</TableCell>
-                        <TableCell colSpan={3}
-                                   disabled = {(this.state.disabled)? "disabled" : ""}
-                        >
+                        <TableCell colSpan={3}>
                             <TextArea
-
+                                disabled = {this.state.disabled}
                                 className={'TextArea'}
                                       defaultValue={e.Bibliografie}
                                       onChange={((e, data) => this.bibliografie(data.value))}
@@ -303,7 +360,7 @@ componentDidUpdate(prevProps, prevState) {
                         <TableCell>Aspecte particulare privind lucrarea:</TableCell>
                         <TableCell colSpan={3}>
                             <TextArea
-                                disabled = {(this.state.disabled2)? "disabled" : ""}
+                                disabled = {this.state.disabled2}
                                 className={'TextArea'}
                                       defaultValue={e.Aspecte_particulare}
                                       onChange={((e, data) => this.aspecteparticulare(data.value))}
@@ -317,13 +374,11 @@ componentDidUpdate(prevProps, prevState) {
                     <TableCell>Termen 4</TableCell>
                 </TableRow>
                     <TableRow>
-                        <TableCell
-                            disabled = {(this.state.disabled)? "disabled" : ""}
-                        >
+                        <TableCell>
 
 
                             <SingleDatePicker
-
+                                disabled = {this.state.disabled}
                                date={moment(this.state.t1)}
                                 onDateChange={t1=>this.setState({t1})}
                                 displayFormat="DD/MM/YYYY"
@@ -338,10 +393,10 @@ componentDidUpdate(prevProps, prevState) {
                         </TableCell>
 
                         <TableCell
-                            disabled = {(this.state.disabled)? "disabled" : ""}
+
                         >
                             <SingleDatePicker
-
+                                disabled = {this.state.disabled}
                                 date={moment(this.state.t2)}
                                 onDateChange={t2=>this.setState({t2})}
                                 displayFormat="DD/MM/YYYY"
@@ -354,10 +409,10 @@ componentDidUpdate(prevProps, prevState) {
 
                         </TableCell>
                         <TableCell
-                            disabled = {(this.state.disabled)? "disabled" : ""}
+
                         >
                             <SingleDatePicker
-
+                                disabled = {this.state.disabled}
                                 date={moment(this.state.t3)}
                                 onDateChange={t3=>this.setState({t3})}
                                 displayFormat="DD/MM/YYYY"
@@ -369,10 +424,10 @@ componentDidUpdate(prevProps, prevState) {
                             />
                         </TableCell>
                         <TableCell
-                            disabled = {(this.state.disabled)? "disabled" : ""}
+
                         >
                             <SingleDatePicker
-
+                                disabled = {this.state.disabled}
                                 date={moment(this.state.t4)}
                                 onDateChange={t4=>this.setState({t4})}
                                 displayFormat="DD/MM/YYYY"
@@ -388,7 +443,7 @@ componentDidUpdate(prevProps, prevState) {
 
             </Table>
                 <div>Termenul de predare a lucrarii <SingleDatePicker
-
+                    disabled = {this.state.disabled}
                     date={moment(this.state.t5)}
                     onDateChange={t5=>this.setState({t5})}
                     displayFormat="DD/MM/YYYY"
@@ -403,7 +458,7 @@ componentDidUpdate(prevProps, prevState) {
                         <TableHeader>
                             <TableHeaderCell>Student</TableHeaderCell>
                             <TableHeaderCell>Profesor coordonator</TableHeaderCell>
-                            <TableHeaderCell>Diretor departament</TableHeaderCell>
+                            <TableHeaderCell>Director departament</TableHeaderCell>
                         </TableHeader>
                         <tbody>
                         <TableRow>
@@ -414,7 +469,7 @@ componentDidUpdate(prevProps, prevState) {
                         <TableRow>
 
                             <TableCell
-                                 disabled = {(this.state.disabled2)? "disabled" : ""}
+                                 disabled = {this.state.disabled2}
                             >
                                 {e.Student_img_sem==null? <input type="file" onChange={this.onFileChange}/>: <object
                                     style={{width: '80pt', height: '60pt'}}
@@ -424,7 +479,7 @@ componentDidUpdate(prevProps, prevState) {
 
                             </TableCell>
                             <TableCell
-                                disabled = {(this.state.disabled)? "disabled" : ""}
+                                disabled = {this.state.disabled}
 
                             >
                                 {e.Indrumator_img_sem==null? <input type="file" onChange={this.onFileChange}/>: <object
@@ -435,7 +490,7 @@ componentDidUpdate(prevProps, prevState) {
 
                             </TableCell>
                             <TableCell
-                                disabled = {(this.state.disabled2)? "disabled" : ""}
+                                disabled = {this.state.disabled2}
 
                             >
                                 {e.Director_departament_img_sem==null? <input type="file" onChange={this.onFileChange}/>: <object
@@ -448,7 +503,7 @@ componentDidUpdate(prevProps, prevState) {
                         </TableRow>
                         </tbody>
                     </Table>
-                {/*<div>Data: {this.state.date}</div>*/}
+                                {/*<div>Data: {this.state.date}</div>*/}
 
                                 <Button className={"savebutton"} color='green' onClick={() => {this.save(e.ID_fisa_preliminara,e.Probleme_principale)}}>Save</Button>
 
@@ -457,6 +512,52 @@ componentDidUpdate(prevProps, prevState) {
                             </div>
 
                         )})}
+                <Modal
+                    closeIcon
+                    onClose={()=>this.setState({modalSucces:false})}
+                    size={'small'}
+                    open={this.state.modal}
+
+                >
+                    <Modal.Content>
+                        <p >Fisa preliminară a fost completată cu succes!</p>
+                    </Modal.Content>
+
+                </Modal>
+                <Modal
+                    closeIcon
+                    onClose={()=>this.setState({modalEroare:false})}
+                    size={'small'}
+                    open={this.state.modalEroare}
+
+                >
+                    <Modal.Content>
+                        <p >Nu ai completat toate câmpurile!</p>
+                    </Modal.Content>
+
+                </Modal>
+                <Modal
+                    closeIcon
+                    onClose={()=>this.setState({openModal:false})}
+                    size={'small'}
+                    open={this.state.openModal}
+
+                >
+                    <Modal.Content>
+                        <div >
+                            <p >Inserează semnătura pentru toate fisele preliminarii!</p>
+                            <input type="file" onChange={this.onFileChange} disabled = {this.state.disabled1}/>
+                            {this.fileData()}
+
+                        </div>
+                    </Modal.Content>
+                    <Modal.Actions>
+                        {this.state.confirmare}
+                        <Button className={"savebutton"} color='green' onClick={() => {this.salveazaSemnaturiDirDep()}}>Adaugă semnatură</Button>
+
+                    </Modal.Actions>
+
+                </Modal>
 
             </div>
         )

@@ -19,24 +19,28 @@ import {
     TextArea,
     Form,
     Radio,
-    Input, Dropdown, Button
+    Input, Dropdown, Button, MenuItem, Menu
 } from "semantic-ui-react";
 
 
 class RezultatSustinereLicenta extends Component {
-    constructor(props) {
-        super(props)
 
-    }
+
+
+
     state={
         rezultat:null,
         media:null,
-        disabled:false,
+
         listaSefComisie:[],
         SefComisie:null,
+        SefCom:null,
         semnaturaPresedinteComisie:null,
         sesiune:null,
-        rezultatelicenta:null
+        rezultatelicenta:null,
+        ID_fisa_lucrare_absolvire:20,
+        ID_student:347075,
+        ID_AnUniv:39
     }
     handleChange=(e, { value }) =>{
         this.setState({ rezultat:value })
@@ -53,32 +57,32 @@ class RezultatSustinereLicenta extends Component {
         })
     };
     componentDidMount() {
+        // axios
+        //     .get('Optiune/GetProfesoriListPresedinteComisie?ID_AnUniv=' + this.state.ID_AnUniv + '&ID_Student=' + this.state.ID_Student)
+        //
+        //     .then(r => {
+        //         let listaSefComisie = [];
+        //         for (let Profesor of r.data) {
+        //             listaSefComisie.push({
+        //                 key: Profesor.ID_Profesor,
+        //                 value: Profesor.ID_Profesor,
+        //                 text: Profesor.NumeIntreg
+        //
+        //
+        //             })
+        //         }
+        //         this.setState({listaSefComisie: listaSefComisie})
+        //         console.log(listaSefComisie)
+        //     });
         axios
-            .get('Optiune/GetProfesoriListPresedinteComisie?ID_AnUniv=' + this.props.ID_AnUniv + '&ID_Student=' + this.props.ID_Student)
-
-            .then(r => {
-                let listaSefComisie = [];
-                for (let Profesor of r.data) {
-                    listaSefComisie.push({
-                        key: Profesor.ID_Profesor,
-                        value: Profesor.ID_Profesor,
-                        text: Profesor.NumeIntreg
-
-
-                    })
-                }
-                this.setState({listaSefComisie: listaSefComisie})
-                console.log(listaSefComisie)
-            });
-        axios
-            .get('Optiune/GetSesiune?ID_student=' + this.props.ID_Student + '&ID_AnUniv=' + this.props.ID_AnUniv)
+            .get('Optiune/GetSesiune?ID_student=' + this.state.ID_student + '&ID_AnUniv=' + this.state.ID_AnUniv)
 
             .then(r => {
                 this.setState({sesiune: r.data})
 
             })
         axios
-            .get('Optiune/GetRezultatSustinereLicenta?ID_fisa_lucrare_absolvire=' + this.props.ID_fisa_lucrare_absolvire)
+            .get('Optiune/GetRezultatSustinereLicenta?ID_fisa_lucrare_absolvire=' + this.state.ID_fisa_lucrare_absolvire)
             .then(rez => {
                 this.setState({rezultatelicenta: rez.data})
                 console.log(rez.data);
@@ -87,6 +91,7 @@ class RezultatSustinereLicenta extends Component {
                     this.setState({semnaturaPresedinteComisie:rez.data[0].Semnatura_presedinte_comisie})
                     this.setState({media:rez.data[0].Media})
                     this.setState({SefComisie:{key:rez.data[0].ID_presedinte_comisie,value:rez.data[0].ID_presedinte_comisie, text:rez.data[0].NumePresedinteComisie+' '+rez.data[0].PrenumePresedinteComisie}});
+                    this.setState({SefCom:rez.data[0].NumePresedinteComisie+' '+rez.data[0].PrenumePresedinteComisie})
                         console.log(rez.data[0].ID_presedinte_comisie)
                         console.log(rez.data[0].NumePresedinteComisie+' '+rez.data[0].PrenumePresedinteComisie)
 
@@ -125,17 +130,14 @@ class RezultatSustinereLicenta extends Component {
         // Send formData object
         console.log(formData)
         axios
-            .post('Optiune/PostRezultatSustinereLicenta?Media='+this.state.media+'&Sesiune='+this.state.sesiune+'&ID_status_rezultat='+this.state.rezultat+'&ID_presedinte_comisie='+this.state.SefComisie+'&ID_fisa_lucrare_absolvire='+this.props.ID_fisa_lucrare_absolvire,formData)
+            .post('Optiune/PostRezultatSustinereLicenta?Media='+this.state.media+'&ID_status_rezultat='+this.state.rezultat+'&ID_presedinte_comisie='+this.state.SefComisie+'&ID_fisa_lucrare_absolvire='+this.state.ID_fisa_lucrare_absolvire,formData)
             .then(rez=>{
                 console.log("REZULTAT ADAUGAT")
             }
 
         )
     }
-    alegeSefComisie=(sefcomisie)=>{
-        this.setState({SefComisie: sefcomisie})
-        console.log(this.state.SefComisie)
-    }
+
     changeMedia=(media)=>{
         this.setState({
             media:media
@@ -144,27 +146,52 @@ class RezultatSustinereLicenta extends Component {
     render(){
 
         return(
-            <div >
+            <div className={'body'} >
+                    <h1> SUSŢINEREA LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENTĂ/
+                        PROIECTULUI DE DIPLOMĂ/ DISERTATIEI</h1>
+                <Menu
+                    borderless inverted color={'grey'}>
+                    <MenuItem>
+                        <Dropdown
 
+                            searchInput={{ type: 'string' }}
+                            placeholder='Alege fisa lucrarii'
+                           search   selection   options={this.state.fisepreliminarii}
+                           // value={this.state.selectedValue}
+                            onChange={((e, data) => this.seteazaUsername(data.value))}
+                        />
+                    </MenuItem>
+
+
+                    <MenuItem>
+
+                        <Button className={"savebutton"} color='green' onClick={() => {this.back()}}>Inapoi</Button>
+                    </MenuItem>
+                    <MenuItem>
+                        <Button className={"savebutton"} color='green' onClick={() => {this.next()}}>Urmatorul</Button>
+                    </MenuItem>
+
+                </Menu>
                 <Table>
-                    <TableHeader>
-                        <TableHeaderCell colSpan={3}>
-                            SUSŢINEREA LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENŢĂ/
-                            PROIECTULUI DE DIPLOMĂ/ DISERTAŢIEI
+                    {/*<TableHeader>*/}
+                    {/*    <TableHeaderCell colSpan={3}>*/}
+                    {/*        SUSŢINEREA LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENŢĂ/*/}
+                    {/*        PROIECTULUI DE DIPLOMĂ/ DISERTAŢIEI*/}
 
-                        </TableHeaderCell>
-                    </TableHeader>
+                    {/*    </TableHeaderCell>*/}
+                    {/*</TableHeader>*/}
                     <tbody>
                     <TableRow>
                         <TableCell >Sesiunea</TableCell>
-                        <TableCell>{this.state.sesiune}</TableCell>
+                        {/*<TableCell>{this.state.sesiune}</TableCell>*/}
+                        <TableCell></TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell>
                             Rezultatul
                             susţinerii
                         </TableCell>
-                        <TableCell disabled = {(this.props.disabled)? "disabled" : ""}>
+                        <TableCell >
                             <Form>
 
                                 <Form.Field>
@@ -200,8 +227,7 @@ class RezultatSustinereLicenta extends Component {
                         <TableCell >
 
                             Media:
-                                <TextArea disabled = {(this.props.disabled)? "disabled" : ""}
-
+                                <TextArea
                                     className={'TextArea'}
                                     value={this.state.media}
                                           onChange={((e, data) => this.changeMedia(data.value))}
@@ -213,17 +239,9 @@ class RezultatSustinereLicenta extends Component {
                         <TableCell>
                             Presedinte comisie:
                         </TableCell>
-                        <TableCell disabled = {(this.props.disabled)? "disabled" : ""}>
+                        <TableCell >
+                           {this.state.SefCom}
 
-                            <Dropdown
-
-                                searchInput={{ type: 'string' }}
-                                placeholder='Alege SefComisie '
-                                search selection   options={this.state.listaSefComisie}
-                                    value={this.state.SefComisie&&this.state.SefComisie.value}
-                                defaultValue={this.state.SefComisie&&this.state.SefComisie.value}
-                                onChange={((e, data) => this.alegeSefComisie(data.value))}
-                            />
                         </TableCell>
                         <TableCell>
 

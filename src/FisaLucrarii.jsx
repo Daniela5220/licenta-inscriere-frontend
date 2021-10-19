@@ -92,8 +92,8 @@ class FisaLucrarii extends Component {
 
         ],
         selectedFile: null,
-      // dataprimire: moment(),
-       // datapredare: moment(),
+       dataprimire: moment(),
+        datapredare: moment(),
         disabled:false,
         disabled2:false,
         disabled1:false,
@@ -177,6 +177,9 @@ class FisaLucrarii extends Component {
             if(this.props.rol==2){
                 this.setState({disabled:true})
             }
+        if(this.props.rol==0){
+            this.setState({disabled1:true})
+        }
 
         axios
             .get('Optiune/GetFisaLucrareAbsolvireStudent?UsernameStudent=' + this.props.usernameStudent)
@@ -242,6 +245,11 @@ class FisaLucrarii extends Component {
                         val1: 2
                     })
                 }
+                if (response.data[0].Indrumator_calificativ == null) {
+                    this.setState({
+                        val1: null
+                    })
+                }
                 if (response.data[0].Director_departament_calificativ == 'ADMIS') {
                     this.setState({
                         val2: 1
@@ -252,6 +260,13 @@ class FisaLucrarii extends Component {
                         val2: 2
                     })
                 }
+                if (response.data[0].Director_departament_calificativ == null) {
+                    this.setState({
+                        val2: null
+                    })
+                }
+                console.log(response.data[0].Indrumator_calificativ)
+                console.log(this.state.val1)
                 if (response.data[0].Tema_lucrare != null) {
                     this.setState({
                         tema: response.data[0].Tema_lucrare
@@ -284,24 +299,26 @@ class FisaLucrarii extends Component {
                 }
                 if (response.data[0].Data_predare != null) {
                     this.setState({
-                        datapredare: response.data[0].Data_predare
+                        datapredare:moment(response.data[0].Data_predare).format('DD/MM/yyyy')
                     })
                 }else{
                     this.setState({
-                        datapredare:moment()
+                        datapredare: moment()
                     })
                 }
-                if (response.data[0].Data_primire== null) {
+
+                if (response.data[0].Data_primire!= null) {
 
                     this.setState({
-                        datapimire:moment()
+                        dataprimire:moment(response.data[0].Data_primire).format('DD/MM/yyyy')
                     })
+
                 }else{
                     this.setState({
-                        datapimire: response.data[0].Data_primire
+                        dataprimire: moment()
                     })
-
                 }
+
 
 
             });
@@ -360,54 +377,42 @@ class FisaLucrarii extends Component {
     }
 
     saveChange = (idfisa) => {
-        const formData = new FormData();
-        formData.append(
-            "myFile",
-            this.state.fileSemn,
-            this.state.fileSemn.name
-        );
+
         const request = {
             ID_fisa_lucrare_absolvire: idfisa,
             tema_lucrare: this.state.tema,
             probleme_principale: this.state.problemePrincipale,
             loc_durata_practica: this.state.locdurata,
             bibliografie: this.state.bibliografie,
-            data_primire: this.state.dataprimire.format('DD/MM/yyyy'),
-            data_predare: this.state.datapredare.format('DD/MM/yyyy'),
+            data_primire: moment(this.state.dataprimire).format('DD/MM/yyyy'),
+            data_predare: moment(this.state.datapredare).format('DD/MM/yyyy'),
             Aspecte_particulare: this.state.aspecteParticulare
         };
         const post = JSON.stringify(request);
-        //post modificari fisa lucrare absolvire student +profesor coordonator
-        axios
-            .post('Optiune/PostFisaLucrareUpdate', post)
-            .then(r => {
+        if(this.state.fileSemn==null) {
+            //post modificari fisa lucrare absolvire student +profesor coordonator
+            axios
+                .post('Optiune/PostFisaLucrareUpdate', post)
+                .then(r => {
 
-            })
-        // post semnaturi student, profesor, dir deep
-        axios
-            .post('Optiune/PostFisaLucrareSemnaturi?ID_fisa_lucrare_absolvire=' + idfisa, formData)
-            .then(r => {
+                })
+        }else{
+            const formData = new FormData();
 
-            })
-    }
-    update = (idfisa) => {
-        const request = {
-            ID_fisa_lucrare_absolvire: idfisa,
-            tema_lucrare: this.state.tema,
-            probleme_principale: this.state.problemePrincipale,
-            loc_durata_practica: this.state.locdurata,
-            bibliografie: this.state.bibliografie,
-            data_primire: this.state.dataprimire.format('DD/MM/yyyy'),
-            data_predare: this.state.datapredare.format('DD/MM/yyyy'),
-            Aspecte_particulare: this.state.aspecteParticulare
-        };
-        const post = JSON.stringify(request);
-        //post modificari fisa lucrare absolvire student +profesor coordonator
-        axios
-            .post('Optiune/PostFisaLucrareUpdate', post)
-            .then(r => {
+            formData.append(
+                "myFile",
+                this.state.fileSemn,
+                this.state.fileSemn.name
+            );
 
-            })
+            // post semnaturi student, profesor, dir deep
+
+            axios
+                .post('Optiune/PostFisaLucrareSemnaturi?ID_fisa_lucrare_absolvire=' + idfisa, formData)
+                .then(r => {
+
+                })
+        }
 
     }
 
@@ -462,7 +467,7 @@ class FisaLucrarii extends Component {
                         <div className={'body'} key={e.ID_fisa_lucrare_absolvire}>
 
 
-                            <h1>FIŞA LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENŢĂ/ PROIECTULUI DE DIPLOMĂ/ DISERTAŢTIE</h1>
+                            <h1>FIŞA LUCRĂRII DE ABSOLVIRE/ LUCRĂRII DE LICENTĂ/ PROIECTULUI DE DIPLOMĂ/ DISERTATIE</h1>
                             <Table>
                                 <TableRow>
                                     <TableCell>Universitatea Transilvania din Braşov</TableCell>
@@ -499,48 +504,60 @@ class FisaLucrarii extends Component {
                             <Table>
                                 <TableRow>
                                     <TableCell>
-                                        <div>Tema lucrarii</div>
-                                        <TextArea className={'TextArea'} value={e.Tema_lucrare}
+                                        Tema lucrarii
+                                        <TextArea className={'TextArea'} value={this.state.tema}
+                                                  disabled = {this.state.disabled}
                                                   onChange={((e, data) => this.temalucrare(data.value))}
                                         ></TextArea>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>
-                                        <div>Probleme principale</div>
+                                        Probleme principale
 
-                                        <TextArea className={'TextArea'} value={e.Probleme_principale}
+                                        <TextArea
+                                            disabled = {this.state.disabled}
+                                                className={'TextArea'} value={this.state.problemePrincipale}
                                                   onChange={((e, data) => this.changeProblemePrincipale(data.value))}
                                         ></TextArea>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>
-                                        <div>Locul si durata</div>
+                                        Locul si durata
                                         <TextArea className={'TextArea'}
-                                                  value={e.Loc_durata_practica}></TextArea>
+                                                  value={this.state.locdurata}
+                                                  disabled = {this.state.disabled}
+                                                  onChange={((e, data) => this.locdurata(data.value))}
+
+                                        ></TextArea>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>
-                                        <div>Bibliografie</div>
+                                        Bibliografie
 
-                                        <TextArea className={'TextArea'} value={e.Bibliografie}></TextArea>
+                                        <TextArea className={'TextArea'} value={this.state.bibliografie}
+                                                  disabled = {this.state.disabled}
+                                                  onChange={((e, data) => this.bibliografie(data.value))}
+                                        ></TextArea>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>
-                                        <div>Aspecte particulare</div>
+                                        Aspecte particulare
 
-                                        <TextArea className={'TextArea'} value={e.Aspecte_particulare}
+                                        <TextArea
+                                            disabled = {this.state.disabled1}
+                                            className={'TextArea'} value={this.state.aspecteParticulare}
                                                   onChange={((e, data) => this.aspecteparticulare(data.value))}
                                         ></TextArea>
 
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell>Data predare lucrare: <SingleDatePicker
-
+                                    <TableCell>Data primire tema: <SingleDatePicker
+                                        disabled = {this.state.disabled1}
                                         date={moment(this.state.datapredare)}
                                         onDateChange={datapredare => this.setState({datapredare})}
                                         displayFormat="DD/MM/YYYY"
@@ -553,8 +570,10 @@ class FisaLucrarii extends Component {
                                 </TableRow>
                                 <TableRow>
 
-                                    <TableCell>Data primirii lucrării: <SingleDatePicker
 
+
+                                    <TableCell>Data primirii lucrării: <SingleDatePicker
+                                        disabled = {this.state.disabled}
                                         date={moment(this.state.dataprimire)}
                                         onDateChange={dataprimire => this.setState({dataprimire})}
                                         displayFormat="DD/MM/YYYY"
@@ -566,7 +585,8 @@ class FisaLucrarii extends Component {
                                     /></TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell disabled = {(this.state.disabled)? "disabled" : ""}
+                                    <TableCell disabled = {this.state.disable}
+                                               disabled = {this.state.disabled1}
                                     >
                                         <div> Director departament: {e.NumeDirectorDepartamnet}</div>
                                         {e.Director_departament_semnatura == null ?
@@ -578,7 +598,7 @@ class FisaLucrarii extends Component {
 
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell disabled = {(this.state.disabled)? "disabled" : ""}
+                                    <TableCell disabled = {this.state.disabled}
 
                                     >
                                         <div>Cadru didactic îndrumător: {e.NumeCoordonamtor}</div>
@@ -606,19 +626,20 @@ class FisaLucrarii extends Component {
                             <Button onClick={() => {
                                 this.saveChange(e.ID_fisa_lucrare_absolvire)
                             }}>Salveaza</Button>
-                            <Button onClick={() => {
-                                this.update(e.ID_fisa_lucrare_absolvire)
-                            }}>Salveaza modificarile</Button>
-                            <Table>
+
+                            <Table  >
                                 <TableHeader>
                                     <TableHeaderCell colSpan={3}>
                                         LUCRARE DE ABSOLVIRE/ LUCRARE DE LICENŢĂ/ PROIECT DE DIPLOMĂ/
                                         DISERTAŢIE – VIZE
                                     </TableHeaderCell>
                                     <TableHeaderCell colSpan={3}>
-                                        <Button className={"savebutton"} onClick={() => {
+                                        <Button
+                                            disabled = {this.state.disabled}
+                                            className={"savebutton"} onClick={() => {
 
                                             this.adaugaVizeinState()
+
                                         }}>Adauga vize</Button>
                                     </TableHeaderCell>
 
@@ -638,6 +659,7 @@ class FisaLucrarii extends Component {
                                 {this.state.viza.map((item, index) => {
                                     return (
                                         <Vize
+                                            disabled = {this.state.disabled}
 
                                             colSpan={3}
                                               actualizareOptiuniDinState={this.actualizareOptiuniDinState.bind(this)}
@@ -654,9 +676,7 @@ class FisaLucrarii extends Component {
                                 })}
 
                             </Table>
-                            <Button onClick={() => {
-                                this.saveVize(e.ID_fisa_lucrare_absolvire)
-                            }}>Salveaza Vize</Button>
+
 
 
                             <Table>
@@ -667,7 +687,7 @@ class FisaLucrarii extends Component {
                                 </TableHeader>
                                 <tbody>
                                 <TableRow>
-                                    <TableCell colSpan={3} disabled = {(this.state.disabled)? "disabled" : ""}>
+                                    <TableCell colSpan={3} disabled = {this.state.disabled}>
                                         <TextArea
                                             className={'TextArea'} defaultValue={e.Indrumator_apreciere}
                                             onChange={((e, data) => this.apreciereindrumator(data.value))}
@@ -685,7 +705,7 @@ class FisaLucrarii extends Component {
                                     <TableCell>
                                           {this.dataAvizIndrumator(e.Indrumator_data_aviz)}
                                     </TableCell>
-                                    <TableCell disabled = {(this.state.disabled)? "disabled" : ""}>
+                                    <TableCell disabled = {this.state.disabled}>
 
                                         <Form>
 
@@ -709,11 +729,11 @@ class FisaLucrarii extends Component {
                                             </Form.Field>
                                         </Form>
                                     </TableCell>
-                                    <TableCell disabled = {(this.state.disabled)? "disabled" : ""}>
+                                    <TableCell disabled = {this.state.disabled}>
 
                                         {e.Indrumator_semnat_avize == null ?
                                             <input type="file" onChange={this.onFileChange}/> : <object
-                                                style={{width: '30%', height: '90pt'}}
+                                                style={{width: '30%', height: '85pt'}}
                                                 data={'data:application/pdf;base64,' + e.Indrumator_semnat_avize}></object>
 
                                         }
@@ -722,13 +742,14 @@ class FisaLucrarii extends Component {
                                 </tbody>
                             </Table>
                             <Button
-                                disabled = {(this.state.disabled)? "disabled" : ""}
+                                disabled = {this.state.disabled}
 
                                 onClick={() => {
                                 this.saveIndrumatorAviz(e.ID_fisa_lucrare_absolvire)
                             }}>Salveaza</Button>
 
-                            <Table>
+                            <Table disabled = {this.state.disable}
+                                   disabled = {this.state.disabled1} >
                                 <TableHeader>
                                     <TableHeaderCell colSpan={3}>
                                         AVIZUL DIRECTORULUI DE DEPARTAMENT
@@ -746,8 +767,9 @@ class FisaLucrarii extends Component {
                                     <TableCell>
                                         {this.dataAvizDirDep(e.Director_departament_data_aviz)}
                                     </TableCell>
-                                    <TableCell  disabled = {(this.state.disabled)? "disabled" : ""}>
-                                        <Form >
+                                    <TableCell  disabled = {this.state.disable}
+                                                disabled = {this.state.disabled1}>
+                                        <Form>
 
                                             <Form.Field >
                                                 <Radio
@@ -770,10 +792,11 @@ class FisaLucrarii extends Component {
                                         </Form>
 
                                     </TableCell>
-                                    <TableCell disabled = {(this.props.disabled)? "disabled" : ""}>
+                                    <TableCell disabled = {this.state.disable}
+                                               disabled = {this.state.disabled1}>
                                         {e.Director_departament_semnatura_aviz == null ?
                                             <input type="file" onChange={this.onFileChange}/> : <object
-                                                style={{width: '30%', height: '90pt'}}
+                                                style={{width: '30%', height: '85pt'}}
                                                 data={'data:application/pdf;base64,' + e.Director_departament_semnatura_aviz}></object>
 
                                         }
@@ -785,16 +808,11 @@ class FisaLucrarii extends Component {
                                 </tbody>
                             </Table>
                             <Button
-                                disabled = {(this.state.disabled)? "disabled" : ""}
+                                disabled = {this.state.disabled}
                                 onClick={() => {
                                 this.save(e.ID_fisa_lucrare_absolvire)
                             }}>Salveaza</Button>
-                            <RezultatSustinereLicenta
-                                ID_AnUniv={this.props.ID_AnUniv}
-                                ID_Student={e.ID_student}
-                                ID_fisa_lucrare_absolvire={e.ID_fisa_lucrare_absolvire}
-                                disabled={this.state.disabled}
-                            />
+
 
                         </div>
                     )
@@ -803,7 +821,7 @@ class FisaLucrarii extends Component {
 
 
         )
-    }
+        }
 }
 
 export default FisaLucrarii;
